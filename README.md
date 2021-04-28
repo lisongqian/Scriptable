@@ -9,7 +9,7 @@
 ### 1. lpl赛程
 
 下载lpl.js文件到Scriptable中，桌面小组件默认显示2021msi赛程（暂不支持小号组件）
-![](https://cdn.nlark.com/yuque/0/2021/jpeg/1249968/1619618405836-66afda21-4b85-4b4c-afba-f9fe684cb49d.jpeg?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_10%2Ctext_Q29weXJpZ2h0wqlMaVNvbmdxaWFu%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/lplLarge.jpg)
 
 ### LICENSE
 
