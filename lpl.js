@@ -90,25 +90,57 @@ async function loadLolMatches() {
  * @returns {Promise<void>}
  */
 async function renderLarge() {
-    let matches = []
+    let yesterdayMatches = []
+    let todayMatches = []
+    let tomorrowMatches = []
+    let matches = [] // 要渲染的比赛数组
     let num = 5;
-    let yesterday = new Date()
-    yesterday.setHours(0)
-    yesterday.setMinutes(0)
-    yesterday.setSeconds(0)
-    yesterday.setMilliseconds(0)
-    yesterday.setDate(yesterday.getDate() - 1); // 设置为昨天
+    let competing = 0
+    let today = new Date()
+    today.setHours(0)
+    today.setMinutes(0)
+    today.setSeconds(0)
+    today.setMilliseconds(0)
     for (let i = 0; i < competitionData.length; i++) {
         let val = competitionData[i]
         let matchScheduledAt = new Date(val.MatchDate.replace(/-/g, "/"))
-        if (matchScheduledAt.getTime() < yesterday.getTime()) {
+        if (matchScheduledAt.getDate() < today.getDate() - 1) {
             continue
-        }
-        console.log(matchScheduledAt)
-        matches.push(val)
-        if (matches.length >= num) {
+        } else if (matchScheduledAt.getDate() === today.getDate() - 1) {
+            yesterdayMatches.push(val)
+        } else if (matchScheduledAt.getDate() === today.getDate()) {
+            todayMatches.push(val)
+            if (competing === 0 && val.MatchStatus === "2") // 记录进行中的比赛索引
+            {
+                competing = todayMatches.length
+            }
+        } else if (matchScheduledAt.getTime() > today.getDate() + 1) {
+            tomorrowMatches.push(val)
+        } else {
             break
         }
+    }
+
+    // 下列代码控制正在进行的比赛处于小组件中间显示
+    if (competing === 0) // 今天比赛均未开始或已结束
+    {
+        if (todayMatches[0].MatchStatus === "1")// 未开始
+        {
+            matches = yesterdayMatches.slice(-2)
+            matches = matches.concat(todayMatches.slice(0, 3))
+        } else {
+            matches = todayMatches.slice(0, 4)
+        }
+    } else { // 今天有比赛正在进行
+        if (competing < 3) {
+            matches = yesterdayMatches.slice(competing - 3)
+            matches = matches.concat(todayMatches.slice(0, 3))
+        } else {
+            matches = todayMatches.slice(competing - 3, competing + 2)
+        }
+    }
+    if (matches.length < 5) {
+        matches = matches.concat(tomorrowMatches.splice(0, 5 - matches.length))
     }
     const matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
     const matchImageStack = LW.addStack()
@@ -554,7 +586,6 @@ function addDivider(date, dividerWidth, dividerHeight, dividerLineWidth, divider
     dividerTxt.font = Font.thinMonospacedSystemFont(dividerHeight - 1)
     dividerTxt.textColor = Color.white()
 }
-
 
 
 // 入口函数
