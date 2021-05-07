@@ -4,7 +4,7 @@
 /**
  * @author  SongqianLi
  * @email   mail@lisongqian.cn
- * @datetime    2021-1-17 21:12:46
+ * @datetime    2021-5-7 23:28:15
  * @type LPL比赛日程小组件
  */
 
@@ -34,6 +34,38 @@ let competitionData = {}
 if (config.runsInWidget) {
     presentSize = null
 }
+
+// 入口函数
+let init = async () => {
+    teamList = await loadTeamList()
+    competitionData = await loadLolMatches()
+    //console.log(competitionData)
+    if (config.widgetFamily === "large" || presentSize === "large") {
+        await renderLarge()
+    } else if (config.widgetFamily === "medium" || presentSize === "medium") {
+        await renderMedium()
+    } else if (config.widgetFamily === "small" || presentSize === "small") {
+        await renderSmall()
+    }
+    if (!config.runsInWidget) {
+        if (presentSize === "large") {
+            await mainW.presentLarge()
+        } else if (presentSize === "medium") {
+            await mainW.presentMedium()
+        } else if (presentSize === "small") {
+            await mainW.presentSmall()
+        }
+    }
+}
+init().then(() => {
+    Script.setWidget(mainW)
+    Script.complete()
+})
+
+
+/***********************************************************
+ * 以下为相关操作函数
+ **********************************************************/
 
 /**
  * url转换
@@ -588,30 +620,31 @@ function addDivider(date, dividerWidth, dividerHeight, dividerLineWidth, divider
 }
 
 
-// 入口函数
-let init = async () => {
-    teamList = await loadTeamList()
-    competitionData = await loadLolMatches()
-    //console.log(competitionData)
-    if (config.widgetFamily === "large" || presentSize === "large") {
-        await renderLarge()
-    } else if (config.widgetFamily === "medium" || presentSize === "medium") {
-        await renderMedium()
-    } else if (config.widgetFamily === "small" || presentSize === "small") {
-        await renderSmall()
-    }
-    if (!config.runsInWidget) {
-        if (presentSize === "large") {
-            await mainW.presentLarge()
-        } else if (presentSize === "medium") {
-            await mainW.presentMedium()
-        } else if (presentSize === "small") {
-            await mainW.presentSmall()
+/**
+ * 下载更新
+ * @returns {Promise<void>}
+ */
+async function downloadUpdate() {
+    let files = FileManager.local()
+    const iCloudInUse = files.isFileStoredIniCloud(module.filename)
+    files = iCloudInUse ? FileManager.iCloud() : files
+    let message = ''
+    try {
+        let downloadURL = ""
+        if (widgetConfigs.useGithub) {
+            downloadURL = ""
         }
+        const req = new Request(downloadURL)
+        const codeString = await req.loadString()
+        files.writeString(module.filename, codeString)
+        message = "脚本已更新，请退出脚本重新进入运行生效。"
+    } catch {
+        message = "更新失败，请稍后再试。"
     }
-}
-init().then(() => {
-    Script.setWidget(mainW)
+    const options = ["好的"]
+    await this.generateAlert(message, options)
     Script.complete()
-})
+}
+
+
 
