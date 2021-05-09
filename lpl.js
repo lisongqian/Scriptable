@@ -15,17 +15,20 @@
 // FILE_MGR.write(FILE_MGR.joinPath(FILE_MGR.documentsDirectory(), fileName), RES);
 
 // 全局变量声明
-const mainW = new ListWidget()
+const widget = new ListWidget()
 presentSize = "large"
-mainW.backgroundColor = new Color("#282E4D")
-const LW = mainW.addStack()
-LW.layoutVertically()
-LW.centerAlignContent()
-const lineHeight = 30 // 图片的高度
-const teamNameFontSize = lineHeight * 0.5 // 队名文本大小
+const gradient = new LinearGradient();
+gradient.locations = [0, 1];
+gradient.colors = [new Color("#013d50"), new Color("#02597f")];
+widget.backgroundGradient = gradient
+const mainStack = widget.addStack()
+mainStack.layoutVertically()
+mainStack.centerAlignContent()
+const imageSize = 30 // 图片的大小
+const teamNameFontSize = imageSize * 0.6 // 队名文本大小
 const teamTxtWidth = 60 // 队名的容器宽度
 const timeStrWidth = 60 // 比赛开始时间的容器宽度，比如："16:00"
-const lineWidth = teamTxtWidth * 2 + lineHeight * 3 + timeStrWidth
+const lineWidth = teamTxtWidth * 2 + imageSize * 2.5 + timeStrWidth
 const dateStrWidth = 60 // 分割线中的日期的宽度
 const dlineWidth = (lineWidth - dateStrWidth) / 2 // 分割线的左右两侧宽度比如 : ------2020-10-05------
 const baseUrl = "http://lpl.lisongqian.cn/"
@@ -34,12 +37,18 @@ let competitionData = {}
 if (config.runsInWidget) {
     presentSize = null
 }
+let matchType = 0
 
 // 入口函数
 let init = async () => {
+    try {
+        matchType = parseInt(args.widgetParameter.toString(), 10)
+    } catch (e) {
+        matchType = 152 // 2021 MSI
+    }
+
     teamList = await loadTeamList()
     competitionData = await loadLolMatches()
-    //console.log(competitionData)
     if (config.widgetFamily === "large" || presentSize === "large") {
         await renderLarge()
     } else if (config.widgetFamily === "medium" || presentSize === "medium") {
@@ -49,16 +58,16 @@ let init = async () => {
     }
     if (!config.runsInWidget) {
         if (presentSize === "large") {
-            await mainW.presentLarge()
+            await widget.presentLarge()
         } else if (presentSize === "medium") {
-            await mainW.presentMedium()
+            await widget.presentMedium()
         } else if (presentSize === "small") {
-            await mainW.presentSmall()
+            await widget.presentSmall()
         }
     }
 }
 init().then(() => {
-    Script.setWidget(mainW)
+    Script.setWidget(widget)
     Script.complete()
 })
 
@@ -105,11 +114,10 @@ async function loadTeamList() {
  * @returns {Promise<any>}
  */
 async function loadLolMatches() {
-    const req = new Request(
-        // "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST.js" //全部
-        // "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_148.js" // 2021职业联赛(2021春季赛)
-        "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_152.js" // 2021季中冠军赛
-    )
+    // "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST.js" //全部
+    // "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_148.js" // 2021春季赛
+    let url = "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_" + matchType + ".js"
+    const req = new Request(url)
     return req.loadJSON().then(res => {
         if (res.status == 0)
             return res.msg
@@ -131,10 +139,21 @@ async function renderLarge() {
             break
         }
     }
-    matches = competitionData.slice(i - 2, i + 3)
-
-    const matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
-    const matchImageStack = LW.addStack()
+    if (i > 0)
+    {
+        matches = competitionData.slice(i - 2, i + 3)
+    }
+    else{
+        matches = competitionData.slice(-5)
+    }
+    console.log(1)
+    let matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
+    if (matchType === 152)
+    {
+        matchImg = await getImageByUrl(baseUrl + "msi-logo.png") // 赛事logo
+    }
+    console.log(2)
+    const matchImageStack = mainStack.addStack()
     const matchImage = matchImageStack.addImage(matchImg)
     matchImage.imageSize = new Size(35, 35)
     await renderMatchList(matches)
@@ -158,7 +177,7 @@ async function renderMedium() {
         if (matchScheduledAt.getTime() < now.getTime()) {
             continue
         }
-        console.log(matchScheduledAt)
+        // console.log(matchScheduledAt)
         matches.push(val)
         if (matches.length >= num) {
             break
@@ -166,7 +185,7 @@ async function renderMedium() {
     }
 
     const matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
-    const matchImageStack = LW.addStack()
+    const matchImageStack = mainStack.addStack()
     const matchImage = matchImageStack.addImage(matchImg)
     matchImage.imageSize = new Size(35, 35)
     await renderMatchList(matches)
@@ -197,24 +216,23 @@ async function renderSmall() {
         // logo
         let team1Logo = await getImageByUrl(team1.TeamLogo)
         let team2Logo = await getImageByUrl(team2.TeamLogo)
-        team1Logo.size = new Size(lineHeight, lineHeight)
-        team2Logo.size = new Size(lineHeight, lineHeight)
+        team1Logo.size = new Size(imageSize, imageSize)
+        team2Logo.size = new Size(imageSize, imageSize)
         team1.score = val.ScoreA
         team2.score = val.ScoreB
-        LW.layoutVertically()
-        let topStack = LW.addStack()
+        let topStack = mainStack.addStack()
         let timeStrTxt = topStack.addText(timeStr)
-        timeStrTxt.font = Font.thinMonospacedSystemFont(lineHeight * 0.7)
+        timeStrTxt.font = Font.thinMonospacedSystemFont(imageSize * 0.7)
         timeStrTxt.textColor = Color.white()
 
-        let scoreStack = LW.addStack()
+        let scoreStack = mainStack.addStack()
         const team1ScoreTxt = scoreStack.addText(team1.score.toString())
         const scoreDividerTxt = scoreStack.addText(":")
         const team2ScoreTxt = scoreStack.addText(team2.score.toString())
         const widgetTxts = [scoreDividerTxt, team1ScoreTxt, team2ScoreTxt]
         widgetTxts.forEach(txt => {
             txt.centerAlignText()
-            txt.font = Font.thinMonospacedSystemFont(lineHeight)
+            txt.font = Font.thinMonospacedSystemFont(imageSize)
             txt.textColor = Color.white()
         })
         if (team1.score > team2.score) {
@@ -223,14 +241,14 @@ async function renderSmall() {
             team1ScoreTxt.textColor = Color.darkGray()
         }
         scoreDividerTxt.textColor = Color.darkGray()
-        let teamStack = LW.addStack()
+        let teamStack = mainStack.addStack()
 
         const team1Img_ = teamStack.addImage(team1Logo)
         const team2Img_ = teamStack.addImage(team2Logo)
 
-        team1Img_.imageSize = new Size(lineHeight, lineHeight)
-        team2Img_.imageSize = new Size(lineHeight, lineHeight)
-        teamStack.size = new Size(lineHeight, teamNameFontSize)
+        team1Img_.imageSize = new Size(imageSize, imageSize)
+        team2Img_.imageSize = new Size(imageSize, imageSize)
+        teamStack.size = new Size(imageSize, teamNameFontSize)
         break;
     }
 }
@@ -252,58 +270,67 @@ async function renderMatchList(matches) {
             addDivider(matchScheduledAt, lineWidth, 12, dlineWidth, dateStrWidth)
         }
         lastDate = matchScheduledAt
+        // 1. 加载资源
         // logo
         let team1Logo = await getImageByUrl(team1.TeamLogo)
         let team2Logo = await getImageByUrl(team2.TeamLogo)
-        team1Logo.size = new Size(lineHeight, lineHeight)
-        team2Logo.size = new Size(lineHeight, lineHeight)
+        team1Logo.size = new Size(imageSize, imageSize)
+        team2Logo.size = new Size(imageSize, imageSize)
         team1.score = val.ScoreA
         team2.score = val.ScoreB
-        let LWl = LW.addStack()
-        LWl.size = new Size(lineWidth, lineHeight + teamNameFontSize)
-        let container = LWl.addStack()
-        LW.addSpacer(6)
+        let container = mainStack.addStack()
+        mainStack.addSpacer(6)
+
+        // 2. 添加组件
+        // 时间显示
         let timeStrStack = container.addStack()
         let timeStrTxt = timeStrStack.addText(timeStr)
-        timeStrStack.size = new Size(60, lineHeight + teamNameFontSize)
+        timeStrStack.size = new Size(timeStrWidth, imageSize + teamNameFontSize)
         timeStrStack.layoutVertically()
         timeStrStack.centerAlignContent()
-        timeStrTxt.font = Font.thinMonospacedSystemFont(lineHeight * 0.7)
+        timeStrTxt.font = Font.lightMonospacedSystemFont(imageSize * 0.7)
         timeStrTxt.textColor = Color.white()
+
+        //队伍1
         let team1Stack = container.addStack()
-        let scoreStack = container.addStack()
-        let team2Stack = container.addStack()
-
         team1Stack.layoutVertically()
-        team2Stack.layoutVertically()
+        const team1ImgStack = team1Stack.addStack()
+        const team1TxtStack = team1Stack.addStack()
+        const team1Img = team1ImgStack.addImage(team1Logo)
+        const team1Txt = team1TxtStack.addText(team1.TeamName)
+        team1ImgStack.size = new Size(teamTxtWidth, imageSize)
+        team1TxtStack.size = new Size(teamTxtWidth, teamNameFontSize)
+
+        // 比分
+        let scoreStack = container.addStack()
         scoreStack.layoutVertically()
-        const scoreStack1 = scoreStack.addStack()
-        const scoreStack2 = scoreStack.addStack()
-
-        scoreStack1.size = new Size(lineHeight * 3, lineHeight)
-        if (val.MatchStatus === "1") {
-            const vsTxt = scoreStack1.addText("VS")
-            vsTxt.font = Font.boldMonospacedSystemFont(lineHeight)
+        const topScoreStack = scoreStack.addStack()
+        const bottomScoreStack = scoreStack.addStack()
+        topScoreStack.size = new Size(imageSize * 2.5, imageSize)
+        bottomScoreStack.size = new Size(imageSize * 2.5, teamNameFontSize)
+        bottomScoreStack.centerAlignContent()
+        topScoreStack.centerAlignContent()
+        if (val.MatchStatus === "1") { // 未开始
+            const vsTxt = topScoreStack.addText("VS")
+            vsTxt.font = Font.lightMonospacedSystemFont(imageSize * 0.9)
             vsTxt.textColor = Color.white()
+        } else { // 进行中或已结束
+            const team1ScoreStack = topScoreStack.addStack()
+            const scoreDividerStack = topScoreStack.addStack()
+            const team2ScoreStack = topScoreStack.addStack()
+            team1ScoreStack.size = new Size(imageSize *0.6, imageSize)
+            scoreDividerStack.size = new Size(imageSize, imageSize)
+            team2ScoreStack.size = new Size(imageSize *0.6, imageSize)
 
-        } else {
-            const team1ScoreStack = scoreStack1.addStack()
-            const scoreDividerStack = scoreStack1.addStack()
-            const team2ScoreStack = scoreStack1.addStack()
-
-            const scoreDividerTxt = scoreDividerStack.addText(":")
             const team1ScoreTxt = team1ScoreStack.addText(team1.score.toString())
+            const scoreDividerTxt = scoreDividerStack.addText(":")
             const team2ScoreTxt = team2ScoreStack.addText(team2.score.toString())
-            team1ScoreStack.size = new Size(lineHeight, lineHeight)
-            team2ScoreStack.size = new Size(lineHeight, lineHeight)
-            scoreDividerStack.size = new Size(lineHeight, lineHeight)
 
-            const widgetTxts = [scoreDividerTxt, team1ScoreTxt, team2ScoreTxt]
-            widgetTxts.forEach(txt => {
-                txt.centerAlignText()
-                txt.font = Font.thinMonospacedSystemFont(lineHeight)
-                txt.textColor = Color.white()
-
+            const widgetTxts = [team1ScoreTxt, scoreDividerTxt, team2ScoreTxt]
+            widgetTxts.forEach(item => {
+                item.centerAlignText()
+                item.font = Font.thinMonospacedSystemFont(imageSize)
+                item.textColor = Color.white()
             })
 
             if (team1.score > team2.score) {
@@ -311,10 +338,7 @@ async function renderMatchList(matches) {
             } else if (team1.score < team2.score) {
                 team1ScoreTxt.textColor = Color.darkGray()
             }
-            scoreDividerTxt.textColor = Color.darkGray()
         }
-        scoreStack1.layoutHorizontally()
-        scoreStack1.centerAlignContent()
         let status = val.MatchStatus
         // 当前状态
         if (status === "3") {
@@ -324,45 +348,31 @@ async function renderMatchList(matches) {
         } else if (status === "1") {
             status = "未开始"
         }
-        let statusTxt = scoreStack2.addText(status)
-        scoreStack2.size = new Size(lineHeight * 3, lineHeight)
+        let statusTxt = bottomScoreStack.addText(status)
 
-        scoreStack1.layoutHorizontally()
-        scoreStack1.centerAlignContent()
-
-        const team1ImgStack = team1Stack.addStack()
-        const team1TxtStack = team1Stack.addStack()
-
+        // 队伍2
+        let team2Stack = container.addStack()
+        team2Stack.layoutVertically()
         const team2ImgStack = team2Stack.addStack()
         const team2TxtStack = team2Stack.addStack()
-        const team1Img_ = team1ImgStack.addImage(team1Logo)
-        const team2Img_ = team2ImgStack.addImage(team2Logo)
-
-        const team1Txt = team1TxtStack.addText(team1.TeamName)
+        const team2Img = team2ImgStack.addImage(team2Logo)
         const team2Txt = team2TxtStack.addText(team2.TeamName)
-        team1ImgStack.size = new Size(teamTxtWidth, lineHeight)
-        team2ImgStack.size = new Size(teamTxtWidth, lineHeight)
-        team1Img_.imageSize = new Size(lineHeight, lineHeight)
-        team2Img_.imageSize = new Size(lineHeight, lineHeight)
-        team1TxtStack.size = new Size(teamTxtWidth, teamNameFontSize)
+        team2ImgStack.size = new Size(teamTxtWidth, imageSize)
         team2TxtStack.size = new Size(teamTxtWidth, teamNameFontSize)
 
+        // 字体颜色设置
         const widgetTxts = [team1Txt, team2Txt, statusTxt]
         widgetTxts.forEach(txt => {
             txt.centerAlignText()
-            txt.font = Font.thinMonospacedSystemFont(lineHeight)
+            txt.font = Font.thinMonospacedSystemFont(teamNameFontSize)
             txt.textColor = Color.white()
         })
-        team1Txt.font = Font.thinMonospacedSystemFont(teamNameFontSize)
-        team2Txt.font = Font.thinMonospacedSystemFont(teamNameFontSize)
-        statusTxt.font = Font.thinMonospacedSystemFont(teamNameFontSize - 1)
+
         if (val.MatchStatus === "2") {
             statusTxt.textColor = Color.green()
-        }
-        if (val.MatchStatus === "3") {
+        } else if (val.MatchStatus === "3") {
             statusTxt.textColor = Color.darkGray()
         }
-
     }
 
 }
@@ -563,7 +573,7 @@ function addDividerLine(dividerStack, dividerLineWidth, dividerLineHeight) {
  */
 function addDivider(date, dividerWidth, dividerHeight, dividerLineWidth, dividerTxtWidth) {
     const day = getDay(date)
-    const dividerStack = LW.addStack()
+    const dividerStack = mainStack.addStack()
     // 渲染左侧分割线
     addDividerLine(dividerStack, dividerLineWidth, dividerHeight)
     // 日期文本容器
@@ -574,7 +584,7 @@ function addDivider(date, dividerWidth, dividerHeight, dividerLineWidth, divider
     dividerStack.size = new Size(dividerWidth, dividerHeight)
     dividerTxtStack.size = new Size(dividerTxtWidth, dividerHeight)
     const dividerTxt = dividerTxtStack.addText(day)
-    dividerTxt.font = Font.thinMonospacedSystemFont(dividerHeight - 1)
+    dividerTxt.font = Font.lightMonospacedSystemFont(dividerHeight - 1)
     dividerTxt.textColor = Color.white()
 }
 
@@ -589,10 +599,7 @@ async function downloadUpdate() {
     files = iCloudInUse ? FileManager.iCloud() : files
     let message = ''
     try {
-        let downloadURL = ""
-        if (widgetConfigs.useGithub) {
-            downloadURL = ""
-        }
+        let downloadURL = "https://raw.githubusercontent.com/lisongqian/Scriptable/master/lpl.js"
         const req = new Request(downloadURL)
         const codeString = await req.loadString()
         files.writeString(module.filename, codeString)
