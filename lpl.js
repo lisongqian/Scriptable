@@ -16,7 +16,6 @@
 
 // 全局变量声明
 const widget = new ListWidget()
-presentSize = "large"
 const gradient = new LinearGradient();
 gradient.locations = [0, 1];
 gradient.colors = [new Color("#013d50"), new Color("#02597f")];
@@ -24,21 +23,27 @@ widget.backgroundGradient = gradient
 const mainStack = widget.addStack()
 mainStack.layoutVertically()
 mainStack.centerAlignContent()
-const imageSize = 30 // 图片的大小
+
+let teamList = {}
+let competitionData = {}
+let matchType = 0
+let presentSize = "small"
+if (config.runsInWidget) {
+    presentSize = null
+}
+let imageSize = 30 // 图片的大小
+let teamTxtWidth = 60 // 队名的容器宽度
+let timeStrWidth = 60 // 比赛开始时间的容器宽度，比如："16:00"
+if (config.widgetFamily === "small" || presentSize === "small") {
+    imageSize = imageSize * 0.6
+    teamTxtWidth = teamTxtWidth * 0.6
+    timeStrWidth = timeStrWidth * 0.6
+}
 const teamNameFontSize = imageSize * 0.6 // 队名文本大小
-const teamTxtWidth = 60 // 队名的容器宽度
-const timeStrWidth = 60 // 比赛开始时间的容器宽度，比如："16:00"
 const lineWidth = teamTxtWidth * 2 + imageSize * 2.5 + timeStrWidth
 const dateStrWidth = 60 // 分割线中的日期的宽度
 const dlineWidth = (lineWidth - dateStrWidth) / 2 // 分割线的左右两侧宽度比如 : ------2020-10-05------
 const baseUrl = "http://lpl.lisongqian.cn/"
-let teamList = {}
-let competitionData = {}
-if (config.runsInWidget) {
-    presentSize = null
-}
-let matchType = 0
-
 // 入口函数
 let init = async () => {
     try {
@@ -139,20 +144,15 @@ async function renderLarge() {
             break
         }
     }
-    if (i > 0)
-    {
-        matches = competitionData.slice(i - 2, i + 3)
+    if (i > 0) {
+        matches = competitionData.slice(i - 2, i - 2 + num)
+    } else {
+        matches = competitionData.slice(-num)
     }
-    else{
-        matches = competitionData.slice(-5)
-    }
-    console.log(1)
     let matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
-    if (matchType === 152)
-    {
+    if (matchType === 152) {
         matchImg = await getImageByUrl(baseUrl + "msi-logo.png") // 赛事logo
     }
-    console.log(2)
     const matchImageStack = mainStack.addStack()
     const matchImage = matchImageStack.addImage(matchImg)
     matchImage.imageSize = new Size(35, 35)
@@ -164,97 +164,152 @@ async function renderLarge() {
  * @returns {Promise<void>}
  */
 async function renderMedium() {
-    let matches = []
-    let num = 2
-    let now = new Date()
-    now.setHours(0)
-    now.setMinutes(0)
-    now.setSeconds(0)
-    now.setMilliseconds(0)
-    for (let i = 0; i < competitionData.length; i++) {
+    let matches = [] // 要渲染的比赛数组
+    let num = 2;
+    for (var i = 0; i < competitionData.length; i++) {
         let val = competitionData[i]
-        let matchScheduledAt = new Date(val.MatchDate.replace(/-/g, "/"))
-        if (matchScheduledAt.getTime() < now.getTime()) {
-            continue
-        }
-        // console.log(matchScheduledAt)
-        matches.push(val)
-        if (matches.length >= num) {
+        if (val.MatchStatus === "1" || val.MatchStatus === "2") // 未开始或进行中
+        {
             break
         }
     }
-
-    const matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
-    const matchImageStack = mainStack.addStack()
-    const matchImage = matchImageStack.addImage(matchImg)
-    matchImage.imageSize = new Size(35, 35)
+    if (i > 0) {
+        matches = competitionData.slice(i, i + num)
+    } else {
+        matches = competitionData.slice(-num)
+    }
+    // let matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
+    // if (matchType === 152)
+    // {
+    //     matchImg = await getImageByUrl(baseUrl + "msi-logo.png") // 赛事logo
+    // }
+    // const matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
+    // const matchImageStack = mainStack.addStack()
+    // const matchImage = matchImageStack.addImage(matchImg)
+    // matchImage.imageSize = new Size(35, 35)
     await renderMatchList(matches)
 }
 
 /**
  * 渲染小号组件
- * TODO 暂未实现
  * @returns {Promise<void>}
  */
 async function renderSmall() {
-    let num = 1
-    let now = new Date()
-    now.setHours(0)
-    now.setMinutes(0)
-    now.setSeconds(0)
-    now.setMilliseconds(0)
-    for (let i = 0; i < competitionData.length; i++) {
+    let matches = [] // 要渲染的比赛数组
+    let num = 4;
+    for (var i = 0; i < competitionData.length; i++) {
         let val = competitionData[i]
-        let matchScheduledAt = new Date(val.MatchDate.replace(/-/g, "/"))
-        if (val.MatchStatus !== "2") {  // 只显示正在进行的比赛
-            continue
+        if (val.MatchStatus === "1" || val.MatchStatus === "2") // 未开始或进行中
+        {
+            break
         }
-        let team1 = teamList[val.TeamA] // 队伍1
-        let team2 = teamList[val.TeamB] // 队伍2
-        let timeStr = dateFormat("HH:MM", matchScheduledAt)
+    }
+    if (i > 0) {
+        matches = competitionData.slice(i, i + num)
+        for (let i = 0; i < matches.length; i++) {
+            let val = matches[i]
+            let team1 = teamList[val.TeamA] // 队伍1
+            let team2 = teamList[val.TeamB] // 队伍2
+            // 1. 加载资源
+            // logo
+            let team1Logo = await getImageByUrl(team1.TeamLogo)
+            let team2Logo = await getImageByUrl(team2.TeamLogo)
+            team1Logo.size = new Size(imageSize, imageSize)
+            team2Logo.size = new Size(imageSize, imageSize)
+            team1.score = val.ScoreA
+            team2.score = val.ScoreB
+            let container = mainStack.addStack()
+            mainStack.addSpacer(6)
+            // 2. 添加组件
+            //队伍1
+            let team1Stack = container.addStack()
+            team1Stack.layoutVertically()
+            const team1ImgStack = team1Stack.addStack()
+            const team1TxtStack = team1Stack.addStack()
+            const team1Img = team1ImgStack.addImage(team1Logo)
+            const team1Txt = team1TxtStack.addText(team1.TeamName)
+            team1ImgStack.size = new Size(teamTxtWidth, imageSize)
+            team1TxtStack.size = new Size(teamTxtWidth, teamNameFontSize)
 
-        // logo
-        let team1Logo = await getImageByUrl(team1.TeamLogo)
-        let team2Logo = await getImageByUrl(team2.TeamLogo)
-        team1Logo.size = new Size(imageSize, imageSize)
-        team2Logo.size = new Size(imageSize, imageSize)
-        team1.score = val.ScoreA
-        team2.score = val.ScoreB
-        let topStack = mainStack.addStack()
-        let timeStrTxt = topStack.addText(timeStr)
-        timeStrTxt.font = Font.thinMonospacedSystemFont(imageSize * 0.7)
-        timeStrTxt.textColor = Color.white()
+            // 比分
+            let scoreStack = container.addStack()
+            scoreStack.layoutVertically()
+            const topScoreStack = scoreStack.addStack()
+            const bottomScoreStack = scoreStack.addStack()
+            topScoreStack.size = new Size(imageSize * 2.5, imageSize)
+            bottomScoreStack.size = new Size(imageSize * 2.5, teamNameFontSize)
+            bottomScoreStack.centerAlignContent()
+            topScoreStack.centerAlignContent()
+            if (val.MatchStatus === "1") { // 未开始
+                const vsTxt = topScoreStack.addText("VS")
+                vsTxt.font = Font.lightMonospacedSystemFont(imageSize * 0.9)
+                vsTxt.textColor = Color.white()
+            } else { // 进行中或已结束
+                const team1ScoreStack = topScoreStack.addStack()
+                const scoreDividerStack = topScoreStack.addStack()
+                const team2ScoreStack = topScoreStack.addStack()
+                team1ScoreStack.size = new Size(imageSize * 0.6, imageSize)
+                scoreDividerStack.size = new Size(imageSize, imageSize)
+                team2ScoreStack.size = new Size(imageSize * 0.6, imageSize)
 
-        let scoreStack = mainStack.addStack()
-        const team1ScoreTxt = scoreStack.addText(team1.score.toString())
-        const scoreDividerTxt = scoreStack.addText(":")
-        const team2ScoreTxt = scoreStack.addText(team2.score.toString())
-        const widgetTxts = [scoreDividerTxt, team1ScoreTxt, team2ScoreTxt]
-        widgetTxts.forEach(txt => {
-            txt.centerAlignText()
-            txt.font = Font.thinMonospacedSystemFont(imageSize)
-            txt.textColor = Color.white()
-        })
-        if (team1.score > team2.score) {
-            team2ScoreTxt.textColor = Color.darkGray()
-        } else if (team1.score < team2.score) {
-            team1ScoreTxt.textColor = Color.darkGray()
+                const team1ScoreTxt = team1ScoreStack.addText(team1.score.toString())
+                const scoreDividerTxt = scoreDividerStack.addText(":")
+                const team2ScoreTxt = team2ScoreStack.addText(team2.score.toString())
+
+                const widgetTxts = [team1ScoreTxt, scoreDividerTxt, team2ScoreTxt]
+                widgetTxts.forEach(item => {
+                    item.centerAlignText()
+                    item.font = Font.thinMonospacedSystemFont(imageSize)
+                    item.textColor = Color.white()
+                })
+
+                if (team1.score > team2.score) {
+                    team2ScoreTxt.textColor = Color.darkGray()
+                } else if (team1.score < team2.score) {
+                    team1ScoreTxt.textColor = Color.darkGray()
+                }
+            }
+            let status = val.MatchStatus
+            // 当前状态
+            if (status === "3") {
+                status = "已结束"
+            } else if (status === "2") {
+                status = "进行中"
+            } else if (status === "1") {
+                status = "未开始"
+            }
+            let statusTxt = bottomScoreStack.addText(status)
+            // 队伍2
+            let team2Stack = container.addStack()
+            team2Stack.layoutVertically()
+            const team2ImgStack = team2Stack.addStack()
+            const team2TxtStack = team2Stack.addStack()
+            const team2Img = team2ImgStack.addImage(team2Logo)
+            const team2Txt = team2TxtStack.addText(team2.TeamName)
+            team2ImgStack.size = new Size(teamTxtWidth, imageSize)
+            team2TxtStack.size = new Size(teamTxtWidth, teamNameFontSize)
+
+            // 字体颜色设置
+            const widgetTxts = [team1Txt, team2Txt, statusTxt]
+            widgetTxts.forEach(txt => {
+                txt.centerAlignText()
+                txt.font = Font.thinMonospacedSystemFont(teamNameFontSize)
+                txt.textColor = Color.white()
+            })
+            if (val.MatchStatus === "2") {
+                statusTxt.textColor = Color.green()
+            } else if (val.MatchStatus === "3") {
+                statusTxt.textColor = Color.darkGray()
+            }
         }
-        scoreDividerTxt.textColor = Color.darkGray()
-        let teamStack = mainStack.addStack()
 
-        const team1Img_ = teamStack.addImage(team1Logo)
-        const team2Img_ = teamStack.addImage(team2Logo)
-
-        team1Img_.imageSize = new Size(imageSize, imageSize)
-        team2Img_.imageSize = new Size(imageSize, imageSize)
-        teamStack.size = new Size(imageSize, teamNameFontSize)
-        break;
+    } else {
+        const alertText = mainStack.addText("无进行中或未开始的比赛")
     }
 }
 
 /**
- * 渲染比赛列表-公共函数
+ * 渲染大中型组件的比赛列表-公共函数
  * @param matches
  * @returns {Promise<void>}
  */
@@ -318,9 +373,9 @@ async function renderMatchList(matches) {
             const team1ScoreStack = topScoreStack.addStack()
             const scoreDividerStack = topScoreStack.addStack()
             const team2ScoreStack = topScoreStack.addStack()
-            team1ScoreStack.size = new Size(imageSize *0.6, imageSize)
+            team1ScoreStack.size = new Size(imageSize * 0.6, imageSize)
             scoreDividerStack.size = new Size(imageSize, imageSize)
-            team2ScoreStack.size = new Size(imageSize *0.6, imageSize)
+            team2ScoreStack.size = new Size(imageSize * 0.6, imageSize)
 
             const team1ScoreTxt = team1ScoreStack.addText(team1.score.toString())
             const scoreDividerTxt = scoreDividerStack.addText(":")
