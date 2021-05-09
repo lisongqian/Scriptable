@@ -122,58 +122,17 @@ async function loadLolMatches() {
  * @returns {Promise<void>}
  */
 async function renderLarge() {
-    let yesterdayMatches = []
-    let todayMatches = []
-    let tomorrowMatches = []
     let matches = [] // 要渲染的比赛数组
     let num = 5;
-    let competing = 0
-    let today = new Date()
-    today.setHours(0)
-    today.setMinutes(0)
-    today.setSeconds(0)
-    today.setMilliseconds(0)
-    for (let i = 0; i < competitionData.length; i++) {
+    for (var i = 0; i < competitionData.length; i++) {
         let val = competitionData[i]
-        let matchScheduledAt = new Date(val.MatchDate.replace(/-/g, "/"))
-        if (matchScheduledAt.getDate() < today.getDate() - 1) {
-            continue
-        } else if (matchScheduledAt.getDate() === today.getDate() - 1) {
-            yesterdayMatches.push(val)
-        } else if (matchScheduledAt.getDate() === today.getDate()) {
-            todayMatches.push(val)
-            if (competing === 0 && val.MatchStatus === "2") // 记录进行中的比赛索引
-            {
-                competing = todayMatches.length
-            }
-        } else if (matchScheduledAt.getTime() > today.getDate() + 1) {
-            tomorrowMatches.push(val)
-        } else {
+        if (val.MatchStatus === "1" || val.MatchStatus === "2") // 未开始或进行中
+        {
             break
         }
     }
+    matches = competitionData.slice(i - 2, i + 3)
 
-    // 下列代码控制正在进行的比赛处于小组件中间显示
-    if (competing === 0) // 今天比赛均未开始或已结束
-    {
-        if (todayMatches[0].MatchStatus === "1")// 未开始
-        {
-            matches = yesterdayMatches.slice(-2)
-            matches = matches.concat(todayMatches.slice(0, 3))
-        } else {
-            matches = todayMatches.slice(0, 4)
-        }
-    } else { // 今天有比赛正在进行
-        if (competing < 3) {
-            matches = yesterdayMatches.slice(competing - 3)
-            matches = matches.concat(todayMatches.slice(0, 3))
-        } else {
-            matches = todayMatches.slice(competing - 3, competing + 2)
-        }
-    }
-    if (matches.length < 5) {
-        matches = matches.concat(tomorrowMatches.splice(0, 5 - matches.length))
-    }
     const matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
     const matchImageStack = LW.addStack()
     const matchImage = matchImageStack.addImage(matchImg)
