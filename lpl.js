@@ -44,6 +44,7 @@ const lineWidth = teamTxtWidth * 2 + imageSize * 2.5 + timeStrWidth
 const dateStrWidth = 60 // 分割线中的日期的宽度
 const dlineWidth = (lineWidth - dateStrWidth) / 2 // 分割线的左右两侧宽度比如 : ------2020-10-05------
 const baseUrl = "http://lpl.lisongqian.cn/"
+const upgrade = false
 // 入口函数
 let init = async () => {
     try {
@@ -69,6 +70,9 @@ let init = async () => {
         } else if (presentSize === "small") {
             await widget.presentSmall()
         }
+        // Safari.open("https://huya.com/660000")
+        if (upgrade)
+            await downloadUpdate()
     }
 }
 init().then(() => {
@@ -205,7 +209,7 @@ async function renderSmall() {
         }
     }
     if (i > 0) {
-        matches = competitionData.slice(i, i + num)
+        matches = competitionData.slice(i - 1, i - 1 + num)
         for (let i = 0; i < matches.length; i++) {
             let val = matches[i]
             let team1 = teamList[val.TeamA] // 队伍1
