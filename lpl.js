@@ -102,13 +102,10 @@ function convertUrl(url) {
  * @returns {Promise<any>}
  */
 async function loadTeamList() {
-    console.log(1)
     const req = new Request(
         baseUrl + "teamlist.php"
     )
-    console.log(2)
     return req.loadJSON().then(res => {
-        console.log(res)
         if (res.status == 0) {
             let newTeamList = {}
             for (let key in res.msg) {
