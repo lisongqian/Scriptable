@@ -50,7 +50,7 @@ let init = async () => {
     try {
         matchType = parseInt(args.widgetParameter.toString(), 10)
     } catch (e) {
-        matchType = 152 // 2021 MSI
+        matchType = 148 // 2021 职业联赛
     }
 
     teamList = await loadTeamList()
@@ -102,10 +102,13 @@ function convertUrl(url) {
  * @returns {Promise<any>}
  */
 async function loadTeamList() {
+    console.log(1)
     const req = new Request(
-        baseUrl + "teamlist.js"
+        baseUrl + "teamlist.php"
     )
+    console.log(2)
     return req.loadJSON().then(res => {
+        console.log(res)
         if (res.status == 0) {
             let newTeamList = {}
             for (let key in res.msg) {
@@ -125,6 +128,7 @@ async function loadTeamList() {
 async function loadLolMatches() {
     // "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST.js" //全部
     // "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_148.js" // 2021春季赛
+    // let url = "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_152.js"
     let url = "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_" + matchType + ".js"
     const req = new Request(url)
     return req.loadJSON().then(res => {
