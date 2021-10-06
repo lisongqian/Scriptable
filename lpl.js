@@ -27,7 +27,7 @@ mainStack.centerAlignContent()
 let teamList = {}
 let competitionData = {}
 let matchType = 0
-let presentSize = "small"
+let presentSize = "large"
 if (config.runsInWidget) {
     presentSize = null
 }
@@ -50,7 +50,9 @@ let init = async () => {
     try {
         matchType = parseInt(args.widgetParameter.toString(), 10)
     } catch (e) {
-        matchType = 148 // 2021 职业联赛
+        // matchType = 148 // 2021 职业联赛
+        // 2021-10-5 20:12:07
+        matchType = 156 // 2021 职业联赛
     }
 
     teamList = await loadTeamList()
@@ -149,18 +151,23 @@ async function renderLarge() {
             break
         }
     }
-    if (i > 0) {
+    if (i > 1) {
         matches = competitionData.slice(i - 2, i - 2 + num)
-    } else {
+    } else if (i === 1) {//有一个比赛已结束
+        matches = competitionData.slice(0, num)
+    } else if (i === 0) {// 全部比赛结束
         matches = competitionData.slice(-num)
     }
     let matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
     if (matchType === 152) {
         matchImg = await getImageByUrl(baseUrl + "msi-logo.png") // 赛事logo
+    } else if (matchType === 156) {
+        matchImg = await getImageByUrl(baseUrl + "world-champion.png")
     }
     const matchImageStack = mainStack.addStack()
     const matchImage = matchImageStack.addImage(matchImg)
     matchImage.imageSize = new Size(35, 35)
+    console.log(matches)
     await renderMatchList(matches)
 }
 
