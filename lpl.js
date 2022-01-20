@@ -126,8 +126,6 @@ async function loadTeamList() {
  */
 async function loadLolMatches() {
     // "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST.js" //全部
-    // "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_148.js" // 2021春季赛
-    // let url = "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_152.js"
     let url = "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_" + matchType + ".js"
     const req = new Request(url)
     return req.loadJSON().then(res => {
@@ -190,15 +188,6 @@ async function renderMedium() {
     } else {
         matches = competitionData.slice(-num)
     }
-    // let matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
-    // if (matchType === 152)
-    // {
-    //     matchImg = await getImageByUrl(baseUrl + "msi-logo.png") // 赛事logo
-    // }
-    // const matchImg = await getImageByUrl(baseUrl + "favicon.ico") // 赛事logo
-    // const matchImageStack = mainStack.addStack()
-    // const matchImage = matchImageStack.addImage(matchImg)
-    // matchImage.imageSize = new Size(35, 35)
     await renderMatchList(matches)
 }
 
