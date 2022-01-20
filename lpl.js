@@ -51,8 +51,8 @@ let init = async () => {
         matchType = parseInt(args.widgetParameter.toString(), 10)
     } catch (e) {
         // matchType = 148 // 2021 职业联赛
-        // 2021-10-5 20:12:07
-        matchType = 156 // 2021 职业联赛
+        // matchType = 156 // 2021 全球总决赛
+        matchType = 167 // 2022 职业联赛
     }
 
     teamList = await loadTeamList()
