@@ -25,7 +25,7 @@
 
 4. **设置小组件属性**。长按刚刚添加的空白小组件，点击第一个选项，选择需要运行的小组件，后两个可保持默认，退出组件编辑，小组件即可正常显示。
 
-![image.png](https://cdn.nlark.com/yuque/0/2021/png/1249968/1620906772241-246f2682-4f76-413f-8ee7-3f83a506a177.png#crop=0&crop=0&crop=1&crop=1&height=674&id=u05383026&margin=%5Bobject%20Object%5D&name=image.png&originHeight=2693&originWidth=2786&originalType=binary&ratio=1&rotation=0&showTitle=false&size=3777860&status=done&style=none&title=&width=697)
+![image.png](https://cdn.nlark.com/yuque/0/2021/png/1249968/1620906772241-246f2682-4f76-413f-8ee7-3f83a506a177.png)
 
 
 ### 1. lpl赛程
