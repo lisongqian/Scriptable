@@ -21,7 +21,7 @@
 
 3. **添加小组件**。回到桌面添加一个小组件，选择Scriptable组件，根据个人喜好添加大中小三种size，然后退出桌面编辑模式
 
-![_RL[5(@REXY5ML(AW$8TE1M.jpg](https://cdn.nlark.com/yuque/0/2021/jpeg/1249968/1620815934119-8c17d269-4f7a-475d-b3ed-fb9b1ccc2bd0.jpeg#crop=0&crop=0&crop=1&crop=1&height=674&id=u5f2ac821&margin=%5Bobject%20Object%5D&name=_RL%5B5%28%40REXY5ML%28AW%248TE1M.jpg&originHeight=2693&originWidth=2786&originalType=binary&ratio=1&rotation=0&showTitle=false&size=6774201&status=done&style=none&title=&width=697)
+![_RL5(@REXY5ML(AW$8TE1M.jpg](https://cdn.nlark.com/yuque/0/2021/jpeg/1249968/1620815934119-8c17d269-4f7a-475d-b3ed-fb9b1ccc2bd0.jpeg#crop=0&crop=0&crop=1&crop=1&height=674&id=u5f2ac821&margin=%5Bobject%20Object%5D&name=_RL%5B5%28%40REXY5ML%28AW%248TE1M.jpg&originHeight=2693&originWidth=2786&originalType=binary&ratio=1&rotation=0&showTitle=false&size=6774201&status=done&style=none&title=&width=697)
 
 4. **设置小组件属性**。长按刚刚添加的空白小组件，点击第一个选项，选择需要运行的小组件，后两个可保持默认，退出组件编辑，小组件即可正常显示。
 
