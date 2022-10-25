@@ -2,7 +2,7 @@
 
 ### 2022-10-25 更新
 
-1. 目前支持2022全球总决赛。
+1. 百度网盘文件已更新，目前支持2022全球总决赛。
 2. 旧版本的小组件用户可在Parameter中输入184即可显示2022全球总决赛赛程。
 ### 2022-01-20 更新
 
@@ -35,7 +35,7 @@
 ### 1. lpl赛程
 下载lpl.js文件到Scriptable中，桌面小组件默认显示2021全球总决赛赛程。
 ![image4.jpg](images/image4.jpg)
-百度网盘：链接：[https://pan.baidu.com/s/1OY1BdxSF5zdnwPRROkYHSA](https://pan.baidu.com/s/1OY1BdxSF5zdnwPRROkYHSA)  提取码：b8di 
+百度网盘：链接：[https://pan.baidu.com/s/1ijZ_LYjp7xA9yUgpiOJ1JQ?pwd=8tw8](https://pan.baidu.com/s/1ijZ_LYjp7xA9yUgpiOJ1JQ?pwd=8tw8)  提取码：8tw8
 
 
 ### LICENSE
