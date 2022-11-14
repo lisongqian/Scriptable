@@ -5,7 +5,7 @@
  * @author  SongqianLi
  * @email   mail@lisongqian.cn
  * @datetime    2021-5-7 23:28:15
- * @type LPL比赛日程小组件
+ * @type LPL比赛日程小组件  (旧版本，已弃用)
  */
 
 // const fileName = "teamlist.js"
@@ -277,7 +277,7 @@ async function renderSmall() {
             } else if (status === "2") {
                 status = "进行中"
             } else if (status === "1") {
-                status = "未开始"
+                status = "敬请期待"
             }
             let statusTxt = bottomScoreStack.addText(status)
             // 队伍2
@@ -368,7 +368,7 @@ async function renderMatchList(matches) {
         topScoreStack.centerAlignContent()
         if (val.MatchStatus === "1") { // 未开始
             const vsTxt = topScoreStack.addText("VS")
-            vsTxt.font = Font.lightMonospacedSystemFont(imageSize * 0.9)
+            vsTxt.font = Font.thinMonospacedSystemFont(imageSize * 0.9)
             vsTxt.textColor = Color.white()
         } else { // 进行中或已结束
             const team1ScoreStack = topScoreStack.addStack()

@@ -1,5 +1,9 @@
 # Scriptable 小组件
 
+### 2022-11-14 更新
+
+1. 新增世界杯赛程小组件。
+2. 英雄联盟小组件更改为显示最近赛程（不局限赛事类别）。
 ### 2022-10-25 更新
 
 1. 百度网盘文件已更新，目前支持2022全球总决赛。
@@ -32,11 +36,15 @@
 ![image3.png](images/image3.png)
 
 
-### 1. lpl赛程
-下载lpl.js文件到Scriptable中，桌面小组件默认显示2021全球总决赛赛程。
-![image4.jpg](images/image4.jpg)
-百度网盘：链接：[https://pan.baidu.com/s/1ijZ_LYjp7xA9yUgpiOJ1JQ?pwd=8tw8](https://pan.baidu.com/s/1ijZ_LYjp7xA9yUgpiOJ1JQ?pwd=8tw8)  提取码：8tw8
+### 1. lol赛程
 
+下载lol.js文件到Scriptable中，桌面小组件默认显示最新赛程。
+![lol.jpg](images/lol.jpg)
+
+### 2. 2022世界杯赛程
+
+下载fifa.js文件到Scriptable中，桌面小组件默认显示最新赛程。
+![fifa.jpg](images/fifa.jpg)
 
 ### LICENSE
 
