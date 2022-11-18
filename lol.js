@@ -38,8 +38,8 @@ let imageSize = 32 // 图片的大小
 let fontSize = 12
 let smallWidget = false
 if (config.widgetFamily === "small" || presentSize === "small") {
-    // imageSize *= 0.8
-    // fontSize *= 0.8
+    imageSize *= 0.8
+    fontSize *= 0.8
     smallWidget = true
 }
 
@@ -50,7 +50,7 @@ let lineWidth = teamTxtWidth * 2 + imageSize * 4.5 + timeStrWidth
 let dLineStrWidth = imageSize * 3.5 // 分割线中的日期的宽度
 if (smallWidget) {
     lineWidth = teamTxtWidth * 2 + imageSize * 4.5
-    dLineStrWidth = imageSize * 4
+    dLineStrWidth = imageSize * 4.5
 }
 const dlineWidth = (lineWidth - dLineStrWidth) / 2 // 分割线的左右两侧宽度比如 : ------2020-10-05------
 const baseUrl = "http://lpl.lisongqian.cn/"
