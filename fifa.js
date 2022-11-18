@@ -551,14 +551,14 @@ async function downloadUpdate() {
         let files = FileManager.local()
         const iCloudInUse = files.isFileStoredIniCloud(module.filename)
         files = iCloudInUse ? FileManager.iCloud() : files
+        let downloadURL = "https://cdn.jsdelivr.net/gh/lisongqian/Scriptable/fifa.js"
         try {
-            let downloadURL = "https://cdn.jsdelivr.net/gh/lisongqian/Scriptable/" + module.filename
             const req = new Request(downloadURL)
             const codeString = await req.loadString()
             files.writeString(module.filename, codeString)
-            console.log("更新成功，downloadURL:" + downloadURL)
+            console.log("更新成功")
         } catch {
-            console.log("更新失败，请稍后再试。")
+            console.log("更新失败，downloadURL:" + downloadURL)
         }
     }
 }
