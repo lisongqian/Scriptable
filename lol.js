@@ -10,7 +10,7 @@
 
 
 // 全局变量声明
-const version = "1.0.1"
+const version = "1.0.2"
 const upgrade = true
 const widget = new ListWidget()
 widget.backgroundColor = Color.dynamic(
@@ -573,7 +573,7 @@ async function downloadUpdate() {
         let files = FileManager.local()
         const iCloudInUse = files.isFileStoredIniCloud(module.filename)
         files = iCloudInUse ? FileManager.iCloud() : files
-        let downloadURL = "https://cdn.jsdelivr.net/gh/lisongqian/Scriptable/lol.js"
+        let downloadURL = "https://cdn.jsdelivr.net/gh/lisongqian/Scriptable@" + lastVersion + "/lol.js"
         try {
             const req = new Request(downloadURL)
             const codeString = await req.loadString()
