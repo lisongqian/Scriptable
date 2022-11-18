@@ -10,12 +10,12 @@
 
 
 // 全局变量声明
-const version = "1.0.0"
+const version = "1.0.1"
 const upgrade = true
 const widget = new ListWidget()
 widget.backgroundColor = Color.dynamic(
     Color.white(),
-    Color.black()
+    Color.white()
 )
 // 添加渐变色背景
 // const gradient = new LinearGradient()
@@ -56,7 +56,7 @@ const dlineWidth = (lineWidth - dLineStrWidth) / 2 // 分割线的左右两侧�
 const baseUrl = "http://lpl.lisongqian.cn/"
 const textColor = Color.dynamic(
     Color.black(),
-    Color.white()
+    Color.black()
 )
 
 // 入口函数
