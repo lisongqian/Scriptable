@@ -10,32 +10,26 @@
 
 
 // 全局变量声明
+const version = "1.0.0"
+const upgrade = true
 const widget = new ListWidget()
-
-// widget.backgroundColor = Color.dynamic(
-//     new Color("#84fab0"),
-//     new Color("#8fd3f4")
-// )
+widget.backgroundColor = Color.dynamic(
+    Color.white(),
+    Color.black()
+)
 // 添加渐变色背景
-const gradient = new LinearGradient()
-gradient.startPoint = new Point(0, 1)
-gradient.endPoint = new Point(1, 0)
-gradient.locations = [0, 1];
-// gradient.colors = [new Color("#F5DB1A"), new Color("#F3B626")];
-// gradient.colors = [new Color("#F0FF00"), new Color("#58CFFB")]
-// gradient.colors = [new Color("#E3FDF5"), new Color("#FFE6FA")]
-gradient.colors = [new Color("#84fab0"), new Color("#8fd3f4")]
-// gradient.colors = [new Color("#33C6BA"), new Color("#DB8C83")]
-// gradient.colors = [Color.white(), new Color("#ff0030"), new Color("#ff0030"), Color.white(), new Color("#82e7e8"), new Color("#82e7e8"), Color.white()]
-// gradient.locations = [0, 0.49, 0.5, 0.51, 1];
-// gradient.colors = [new Color("#ff0030"), new Color("#ff0030"), new Color("#322125"), new Color("#82e7e8"), new Color("#82e7e8")]
-widget.backgroundGradient = gradient
+// const gradient = new LinearGradient()
+// gradient.startPoint = new Point(0, 1)
+// gradient.endPoint = new Point(1, 0)
+// gradient.locations = [0, 1];
+// gradient.colors = [new Color("#84fab0"), new Color("#8fd3f4")]
+//widget.backgroundGradient = gradient
 
 
 let teamList = {}
 let competitionData = {}
 let matchType = 0
-let presentSize = "small"
+let presentSize = "large"
 if (config.runsInWidget) {
     presentSize = null
 }
@@ -44,27 +38,32 @@ let imageSize = 32 // 图片的大小
 let fontSize = 12
 let smallWidget = false
 if (config.widgetFamily === "small" || presentSize === "small") {
+    // imageSize *= 0.8
+    // fontSize *= 0.8
     smallWidget = true
 }
 
 const teamTxtWidth = imageSize // 队名的容器宽度
 const timeStrWidth = imageSize * 3 // 比赛开始时间的容器宽度，比如："16:00"
 const teamNameHeight = imageSize * 0.6 // 队名文本大小
-let lineWidth = teamTxtWidth * 2 + imageSize * 2.5 + timeStrWidth
+let lineWidth = teamTxtWidth * 2 + imageSize * 4.5 + timeStrWidth
+let dLineStrWidth = imageSize * 3.5 // 分割线中的日期的宽度
 if (smallWidget) {
     lineWidth = teamTxtWidth * 2 + imageSize * 4.5
+    dLineStrWidth = imageSize * 4
 }
-const dLineStrWidth = imageSize * 3 // 分割线中文字的宽度
 const dlineWidth = (lineWidth - dLineStrWidth) / 2 // 分割线的左右两侧宽度比如 : ------2020-10-05------
 const baseUrl = "http://lpl.lisongqian.cn/"
-const upgrade = false
 const textColor = Color.dynamic(
     Color.black(),
-    Color.black()
+    Color.white()
 )
 
 // 入口函数
 async function init() {
+    if(upgrade){
+        await downloadUpdate()
+    }
     try {
         matchType = parseInt(args.widgetParameter.toString(), 10)
     } catch (e) {
@@ -137,7 +136,7 @@ async function renderMatchList() {
         let gameType = val.GameName
         let timeStr = dateFormat("HH:MM", matchScheduledAt)
         if (j === 0 || lastGameType !== gameType) {
-            addDivider(lastGameType, lineWidth, 12, dlineWidth, dLineStrWidth)
+            addDivider(gameType, lineWidth, 12, dlineWidth, dLineStrWidth)
             lastGameType = gameType
         } else {
             addDividerLine(widget, lineWidth, 6, new Color("#909399"))
@@ -155,7 +154,7 @@ async function renderMatchList() {
 
 
         // 时间
-        if(!smallWidget){
+        if (!smallWidget) {
             let dateTimeStack = lineStack.addStack()
             dateTimeStack.size = new Size(timeStrWidth, imageSize + teamNameHeight)
             dateTimeStack.layoutVertically()
@@ -192,12 +191,16 @@ async function renderMatchList() {
 
         // 队伍1
         let team1Stack = lineStack.addStack()
-        team1Stack.size = new Size(imageSize, imageSize + teamNameHeight + 10)
+        team1Stack.size = new Size(imageSize * 2, imageSize + teamNameHeight + 10)
         team1Stack.layoutVertically()
         team1Stack.addImage(team1Logo)
+        team1Stack.centerAlignContent()
         team1Stack.setPadding(10, 0, 0, 0)
+        let team1ImgStack = team1Stack.addStack()
+        team1ImgStack.size = new Size(imageSize * 2, imageSize)
+        team1ImgStack.addImage(team1Logo)
         let team1TxtStack = team1Stack.addStack();//文字居中用
-        team1TxtStack.size = new Size(imageSize, teamNameHeight)
+        team1TxtStack.size = new Size(imageSize * 2, teamNameHeight)
         let team1text = team1TxtStack.addText(team1.TeamName)
         // team1text.textColor = new Color(fontColor, 1)
         team1text.textColor = textColor
@@ -275,14 +278,17 @@ async function renderMatchList() {
 
         // 队伍2
         let team2Stack = lineStack.addStack()
-        team2Stack.size = new Size(imageSize, imageSize + teamNameHeight + 10)
+        team2Stack.size = new Size(imageSize * 2, imageSize + teamNameHeight + 10)
         team2Stack.layoutVertically()
+        team2Stack.centerAlignContent()
         team2Stack.setPadding(10, 0, 0, 0)
         team2Stack.addImage(team2Logo)
+        let team2ImgStack = team2Stack.addStack()
+        team2ImgStack.size = new Size(imageSize * 2, imageSize)
+        team2ImgStack.addImage(team2Logo)
         let team2TxtStack = team2Stack.addStack();//文字居中用
-        team2TxtStack.size = new Size(imageSize, teamNameHeight)
+        team2TxtStack.size = new Size(imageSize * 2, teamNameHeight)
         let team2text = team2TxtStack.addText(team2.TeamName)
-        // team2text.textColor = new Color(fontColor, 1);
         team2text.textColor = textColor
         team2text.font = Font.semiboldSystemFont(fontSize)
     }
@@ -554,4 +560,27 @@ function addDivider(text, dividerWidth, dividerHeight, dividerLineWidth, divider
     const dividerTxt = dividerTxtStack.addText(text)
     dividerTxt.font = Font.lightMonospacedSystemFont(dividerHeight - 1)
     dividerTxt.textColor = textColor
+}
+
+/**
+ * 下载更新
+ * @returns {Promise<void>}
+ */
+async function downloadUpdate() {
+    const r = new Request("http://lpl.lisongqian.cn/version.php?type=lol")
+    const lastVersion = await r.loadString()
+    if (lastVersion > version) {
+        let files = FileManager.local()
+        const iCloudInUse = files.isFileStoredIniCloud(module.filename)
+        files = iCloudInUse ? FileManager.iCloud() : files
+        try {
+            let downloadURL = "https://cdn.jsdelivr.net/gh/lisongqian/Scriptable/" + module.filename
+            const req = new Request(downloadURL)
+            const codeString = await req.loadString()
+            files.writeString(module.filename, codeString)
+            console.log("更新成功，downloadURL:" + downloadURL)
+        } catch {
+            console.log("更新失败，请稍后再试。")
+        }
+    }
 }

@@ -32,20 +32,25 @@ String.prototype.format = function (args) {
 }
 
 // 全局变量声明
+const version = "1.0.0"
+const upgrade = true
 const widget = new ListWidget()
 
-// widget.backgroundColor = new Color("#84fab0")
+widget.backgroundColor = Color.dynamic(
+    Color.white(),
+    Color.black()
+)
 // 添加渐变色背景
-const gradient = new LinearGradient();
-gradient.startPoint = new Point(0, 1)
-gradient.endPoint = new Point(1, 0)
-gradient.locations = [0, 1];
-gradient.colors = [new Color("#84fab0"), new Color("#8fd3f4")]
-widget.backgroundGradient = gradient
+// const gradient = new LinearGradient();
+// gradient.startPoint = new Point(0, 1)
+// gradient.endPoint = new Point(1, 0)
+// gradient.locations = [0, 1];
+// gradient.colors = [new Color("#84fab0"), new Color("#8fd3f4")]
+//widget.backgroundGradient = gradient
 
 
 let competitionData = {}
-let presentSize = "small"
+let presentSize = "large"
 if (config.runsInWidget) {
     presentSize = null
 }
@@ -70,18 +75,17 @@ if (smallWidget) {
 }
 const dlineWidth = (lineWidth - dLineStrWidth) / 2 // 分割线的左右两侧宽度比如 : ------2020-10-05------
 const baseUrl = "https://api.fifa.com/"
-const upgrade = false
 const textColor = Color.dynamic(
     Color.black(),
-    Color.black()
+    Color.white()
 )
 
 // 入口函数
 async function init() {
-
-
+    if(upgrade){
+        await downloadUpdate()
+    }
     competitionData = await loadFIFACompetitions()
-
     await renderMatchList();
     if (!config.runsInWidget) {
         if (presentSize === "large") {
@@ -141,7 +145,7 @@ async function renderMatchList() {
         let gameType = val.CompetitionName[0].Description
         let timeStr = dateFormat("HH:MM", matchDate)
         if (j === 0 || lastGameType !== gameType) {
-            addDivider(lastGameType, lineWidth, 12, dlineWidth, dLineStrWidth)
+            addDivider(gameType, lineWidth, 12, dlineWidth, dLineStrWidth)
             lastGameType = gameType
         } else {
             addDividerLine(widget, lineWidth, 6, new Color("#909399"))
@@ -538,4 +542,23 @@ function addDivider(text, dividerWidth, dividerHeight, dividerLineWidth, divider
     const dividerTxt = dividerTxtStack.addText(text)
     dividerTxt.font = Font.lightMonospacedSystemFont(dividerHeight - 1)
     dividerTxt.textColor = textColor
+}
+
+async function downloadUpdate() {
+    const r = new Request("http://lpl.lisongqian.cn/version.php?type=fifa")
+    const lastVersion = await r.loadString()
+    if (lastVersion > version) {
+        let files = FileManager.local()
+        const iCloudInUse = files.isFileStoredIniCloud(module.filename)
+        files = iCloudInUse ? FileManager.iCloud() : files
+        try {
+            let downloadURL = "https://cdn.jsdelivr.net/gh/lisongqian/Scriptable/" + module.filename
+            const req = new Request(downloadURL)
+            const codeString = await req.loadString()
+            files.writeString(module.filename, codeString)
+            console.log("更新成功，downloadURL:" + downloadURL)
+        } catch {
+            console.log("更新失败，请稍后再试。")
+        }
+    }
 }
