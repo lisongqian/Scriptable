@@ -32,7 +32,7 @@ String.prototype.format = function (args) {
 }
 
 // 全局变量声明
-const version = "1.0.0"
+const version = "1.0.1"
 const upgrade = true
 const widget = new ListWidget()
 
