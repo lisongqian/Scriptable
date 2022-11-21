@@ -269,7 +269,7 @@ async function renderMatchList() {
             team2ScoreTxt.font = Font.semiboldSystemFont(imageSize * 0.8)
             team2ScoreTxt.textColor = Color.white()
 
-            if (val.ResultType === "1") {
+            if (val.ResultType === 1) {
                 if (team1.score > team2.score) {
                     team1ScoreTxt.textColor = new Color("#0febc1")
                 } else if (team1.score < team2.score) {
