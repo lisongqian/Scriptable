@@ -61,7 +61,7 @@ const textColor = Color.dynamic(
 
 // 入口函数
 async function init() {
-    if(upgrade){
+    if (upgrade) {
         await downloadUpdate()
     }
     try {
@@ -124,7 +124,9 @@ async function renderMatchList() {
     } else {//有一个比赛已结束 或 都未开始
         i = 0
     }
-
+    if (i + num - 1 >= competitionData.length) {
+        i = competitionData.length - num
+    }
     let lastGameType = competitionData[i].GameName
     for (let j = 0; j < num; j++) {
         // 比赛和队伍数据
