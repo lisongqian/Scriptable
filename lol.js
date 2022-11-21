@@ -8,11 +8,11 @@
  * @Description LOL比赛日程小组件
  */
 
-
 // 全局变量声明
-const version = "1.0.4"
+const version = "1.0.5"
 const upgrade = true
 const widget = new ListWidget()
+
 widget.backgroundColor = Color.dynamic(
     Color.white(),
     Color.white()
