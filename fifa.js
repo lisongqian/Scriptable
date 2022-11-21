@@ -5,11 +5,11 @@
  * @author  SongqianLi
  * @email   mail@lisongqian.cn
  * @datetime    2022-11-13 10:54:22
- * @type 世界杯日程小组件
+ * @Description 世界杯日程小组件
  */
 
 // 全局变量声明
-const version = "1.0.3"
+const version = "1.0.4"
 const upgrade = true
 const widget = new ListWidget()
 

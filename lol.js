@@ -5,12 +5,12 @@
  * @author  SongqianLi
  * @email   mail@lisongqian.cn
  * @datetime    2022-11-13 10:52:57
- * @type LOL比赛日程小组件
+ * @Description LOL比赛日程小组件
  */
 
 
 // 全局变量声明
-const version = "1.0.2"
+const version = "1.0.4"
 const upgrade = true
 const widget = new ListWidget()
 widget.backgroundColor = Color.dynamic(
