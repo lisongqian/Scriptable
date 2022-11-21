@@ -7,32 +7,9 @@
  * @datetime    2022-11-13 10:54:22
  * @type 世界杯日程小组件
  */
-String.prototype.format = function (args) {
-    if (arguments.length > 0) {
-        let result = this;
-        if (arguments.length === 1 && typeof (args) == "object") {
-            for (let key in args) {
-                let reg = new RegExp("({" + key + "})", "g");
-                result = result.replace(reg, args[key]);
-            }
-        } else {
-            for (let i = 0; i < arguments.length; i++) {
-                if (arguments[i] === undefined) {
-                    return "";
-                } else {
-                    let reg = new RegExp("({[" + i + "]})", "g");
-                    result = result.replace(reg, arguments[i]);
-                }
-            }
-        }
-        return result;
-    } else {
-        return this;
-    }
-}
 
 // 全局变量声明
-const version = "1.0.2"
+const version = "1.0.3"
 const upgrade = true
 const widget = new ListWidget()
 
@@ -79,6 +56,30 @@ const textColor = Color.dynamic(
     Color.black(),
     Color.white()
 )
+
+String.prototype.format = function (args) {
+    if (arguments.length > 0) {
+        let result = this;
+        if (arguments.length === 1 && typeof (args) == "object") {
+            for (let key in args) {
+                let reg = new RegExp("({" + key + "})", "g");
+                result = result.replace(reg, args[key]);
+            }
+        } else {
+            for (let i = 0; i < arguments.length; i++) {
+                if (arguments[i] === undefined) {
+                    return "";
+                } else {
+                    let reg = new RegExp("({[" + i + "]})", "g");
+                    result = result.replace(reg, arguments[i]);
+                }
+            }
+        }
+        return result;
+    } else {
+        return this;
+    }
+}
 
 // 入口函数
 async function init() {
@@ -224,8 +225,7 @@ async function renderMatchList() {
         scoreTopStack.size = new Size(imageSize * 2.5, imageSize)
         let scoreBottomStack = scoreStack.addStack()
         scoreBottomStack.size = new Size(imageSize * 2.5, teamNameHeight)
-        let status = val.MatchStatus
-        if (status === 1) {
+        if (val.MatchStatus === 1) {
             const vsTxt = scoreTopStack.addText("VS")
             vsTxt.centerAlignText()
             vsTxt.font = Font.lightMonospacedSystemFont(imageSize * 0.8)
@@ -269,7 +269,7 @@ async function renderMatchList() {
             team2ScoreTxt.font = Font.semiboldSystemFont(imageSize * 0.8)
             team2ScoreTxt.textColor = Color.white()
 
-            if (status === "3") {
+            if (val.ResultType === "1") {
                 if (team1.score > team2.score) {
                     team1ScoreTxt.textColor = new Color("#0febc1")
                 } else if (team1.score < team2.score) {
