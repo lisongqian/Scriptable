@@ -359,7 +359,7 @@ async function loadImage(imageUrl) {
  * @returns {Promise<*|*>}
  */
 async function getImageByUrl(url, useCache = true) {
-    url = convertUrl(url)
+    //url = convertUrl(url)
     const cacheKey = md5(url)
     const cacheFile = FileManager.local().joinPath(FileManager.local().temporaryDirectory(), cacheKey)
     // 判断是否有缓存
