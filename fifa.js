@@ -9,7 +9,7 @@
  */
 
 // 全局变量声明
-const version = "1.0.5"
+const version = "1.0.7"
 const upgrade = true
 const widget = new ListWidget()
 
