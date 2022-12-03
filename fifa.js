@@ -9,7 +9,7 @@
  */
 
 // 全局变量声明
-const version = "1.0.7"
+const version = "1.1.0"
 const upgrade = true
 const widget = new ListWidget()
 
@@ -116,7 +116,7 @@ async function renderMatchList() {
     }
     for (var i = 0; i < competitionData.length; i++) {
         let val = competitionData[i]
-        if (val.MatchStatus === 1 || val.MatchStatus === 2) // 未开始或进行中
+        if (val.MatchStatus !== 0) // 未开始或进行中
         {
             break
         }
@@ -190,7 +190,8 @@ async function renderMatchList() {
 
             let proGameTypeStack = dateTimeStack.addStack()
             proGameTypeStack.size = new Size(timeStrWidth, imageSize * 0.4)
-            let proGameTypeStrTxt = proGameTypeStack.addText(val.GroupName[0].Description + '-' + val.StageName[0].Description)
+            let gameTypeTxt = val.GroupName.length > 0 ? val.StageName[0].Description + '-' + val.GroupName[0].Description : val.StageName[0].Description
+            let proGameTypeStrTxt = proGameTypeStack.addText(gameTypeTxt)
             proGameTypeStrTxt.font = Font.lightSystemFont(10)
             // proGameTypeStrTxt.textColor = new Color(fontColor, 1)
             proGameTypeStrTxt.textColor = textColor
