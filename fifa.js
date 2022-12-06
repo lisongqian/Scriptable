@@ -9,7 +9,7 @@
  */
 
 // 全局变量声明
-const version = "1.1.0"
+const version = "1.2.0"
 const upgrade = true
 const widget = new ListWidget()
 
@@ -83,7 +83,7 @@ String.prototype.format = function (args) {
 
 // 入口函数
 async function init() {
-    if(upgrade){
+    if (upgrade) {
         await downloadUpdate()
     }
     competitionData = await loadFIFACompetitions()
@@ -158,8 +158,8 @@ async function renderMatchList() {
         let team2Logo = await getImageByUrl(team2.PictureUrl.format({"format": "sq", "size": 4}))
         team1Logo.size = new Size(imageSize, imageSize)
         team2Logo.size = new Size(imageSize, imageSize)
-        team1.score = val.HomeTeamScore === null ? 0 : val.HomeTeamScore
-        team2.score = val.AwayTeamScore === null ? 0 : val.AwayTeamScore
+        team1.score = val.HomeTeamScore === null ? 0 : (val.HomeTeamPenaltyScore == null ? val.HomeTeamScore : val.HomeTeamPenaltyScore + val.HomeTeamScore)
+        team2.score = val.AwayTeamScore === null ? 0 : (val.AwayTeamPenaltyScore == null ? val.AwayTeamScore : val.AwayTeamPenaltyScore + val.AwayTeamScore)
 
 
         // 时间
@@ -270,7 +270,7 @@ async function renderMatchList() {
             team2ScoreTxt.font = Font.semiboldSystemFont(imageSize * 0.8)
             team2ScoreTxt.textColor = Color.white()
 
-            if (val.ResultType === 1) {
+            if (val.ResultType === 1 || val.ResultType === 2) {
                 if (team1.score > team2.score) {
                     team1ScoreTxt.textColor = new Color("#0febc1")
                 } else if (team1.score < team2.score) {
