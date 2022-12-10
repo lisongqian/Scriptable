@@ -9,7 +9,7 @@
  */
 
 // 全局变量声明
-const version = "1.2.0"
+const version = "1.2.1"
 const upgrade = true
 const widget = new ListWidget()
 
@@ -135,11 +135,11 @@ async function renderMatchList() {
         let val = competitionData[i + j]
         let team1 = val.Home // 队伍1
         if (team1 === null) {
-            team1 = {"TeamName": val.PlaceHolderA, "PictureUrl": "http://lpl.lisongqian.cn/team1.png"}
+            team1 = {"TeamName": [{"Description":val.PlaceHolderA}], "PictureUrl": "http://lpl.lisongqian.cn/team1.png"}
         }
         let team2 = val.Away // 队伍2
         if (team2 === null) {
-            team2 = {"TeamName": val.PlaceHolderB, "PictureUrl": "http://lpl.lisongqian.cn/team2.png"}
+            team2 = {"TeamName": [{"Description":val.PlaceHolderB}], "PictureUrl": "http://lpl.lisongqian.cn/team2.png"}
         }
 
         let matchDate = new Date(val.Date)
