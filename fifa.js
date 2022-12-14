@@ -9,7 +9,7 @@
  */
 
 // 全局变量声明
-const version = "1.2.1"
+const version = "1.2.2"
 const upgrade = true
 const widget = new ListWidget()
 
@@ -114,6 +114,7 @@ async function renderMatchList() {
     } else if (config.widgetFamily === "small" || presentSize === "small") {
         num = 2
     }
+    num = num > competitionData.length ? competitionData.length : num
     for (var i = 0; i < competitionData.length; i++) {
         let val = competitionData[i]
         if (val.MatchStatus !== 0) // 未开始或进行中
@@ -128,6 +129,9 @@ async function renderMatchList() {
     } else {//有一个比赛已结束 或 都未开始
         i = 0
     }
+    if (i + num - 1 >= competitionData.length) {
+        i = competitionData.length - num
+    }
 
     let lastGameType = competitionData[i].CompetitionName[0].Description
     for (let j = 0; j < num; j++) {
@@ -135,11 +139,17 @@ async function renderMatchList() {
         let val = competitionData[i + j]
         let team1 = val.Home // 队伍1
         if (team1 === null) {
-            team1 = {"TeamName": [{"Description":val.PlaceHolderA}], "PictureUrl": "http://lpl.lisongqian.cn/team1.png"}
+            team1 = {
+                "TeamName": [{"Description": val.PlaceHolderA}],
+                "PictureUrl": "http://lpl.lisongqian.cn/team1.png"
+            }
         }
         let team2 = val.Away // 队伍2
         if (team2 === null) {
-            team2 = {"TeamName": [{"Description":val.PlaceHolderB}], "PictureUrl": "http://lpl.lisongqian.cn/team2.png"}
+            team2 = {
+                "TeamName": [{"Description": val.PlaceHolderB}],
+                "PictureUrl": "http://lpl.lisongqian.cn/team2.png"
+            }
         }
 
         let matchDate = new Date(val.Date)
