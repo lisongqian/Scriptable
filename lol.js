@@ -9,7 +9,7 @@
  */
 
 // 全局变量声明
-const version = "1.0.7"
+const version = "1.2.3"
 const upgrade = true
 const widget = new ListWidget()
 
@@ -183,7 +183,8 @@ async function renderMatchList() {
 
             let proGameTypeStack = dateTimeStack.addStack()
             proGameTypeStack.size = new Size(timeStrWidth, imageSize * 0.4)
-            let proGameTypeStrTxt = proGameTypeStack.addText(val.GameTypeName + '-' + val.GameProcName)
+            let gameTypeStr = val.GameTypeName.length + val.GameProcName.length >= 7 ? val.GameTypeName : val.GameTypeName + '-' + val.GameProcName
+            let proGameTypeStrTxt = proGameTypeStack.addText(gameTypeStr)
             proGameTypeStrTxt.font = Font.lightSystemFont(10)
             // proGameTypeStrTxt.textColor = new Color(fontColor, 1)
             proGameTypeStrTxt.textColor = textColor
