@@ -4,12 +4,12 @@
 /**
  * @author  SongqianLi
  * @email   mail@lisongqian.cn
- * @datetime    2022-11-13 10:52:57
+ * @datetime    2023-5-8 15:19:46
  * @Description LOL比赛日程小组件
  */
 
 // 全局变量声明
-const version = "1.2.3"
+const version = "1.2.4"
 const upgrade = true
 const widget = new ListWidget()
 
@@ -342,7 +342,7 @@ async function loadLolCompetitions() {
     // "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST.js" //全部
     let url = "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST_" + matchType + ".js"
     if (matchType === 0) {
-        url = "http://lpl.lisongqian.cn/web201612/data/LOL_MATCH2_MATCH_HOMEPAGE_BMATCH_LIST.js"
+        url = "http://lpl.lisongqian.cn/default.php"
     }
     const req = new Request(url)
     return req.loadJSON().then(res => {
