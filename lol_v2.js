@@ -27,11 +27,11 @@ let textColor = Color.dynamic(
 let imageSize = 35
 let fontSize = 12
 let smallWidget = false
-let timeStrWidth = imageSize * 3 // 比赛开始时间的容器宽度，比如："16:00"
+let timeStrWidth = imageSize * 4 // 比赛开始时间的容器宽度，比如："16:00"
 
 let teamWidth = imageSize * 2 // 队伍容器宽度
 let teamNameHeight = imageSize * 0.6 // 队名文本大小
-let lineWidth = teamWidth * 2 + imageSize * 3 + timeStrWidth  // 分割线长度
+let lineWidth = teamWidth * 2 + timeStrWidth + 20  // 分割线长度
 
 /**
  * 参数更新函数
@@ -136,9 +136,7 @@ async function renderMatchList() {
         let team1 = teamList[val.TeamA] // 队伍1
         let team2 = teamList[val.TeamB] // 队伍2
 
-        let matchScheduledAt = new Date(val.MatchDate.replace(/-/g, "/"))
         let gameType = val.GameName
-        let timeStr = dateFormat("HH:MM", matchScheduledAt)
         if (j === 0 || lastGameType !== gameType) {
             addDivider(gameType, lineWidth, 12)
             lastGameType = gameType
@@ -147,7 +145,6 @@ async function renderMatchList() {
         }
         let lineStack = widget.addStack()
         lineStack.size = new Size(lineWidth, imageSize + teamNameHeight)
-        lineStack.setPadding(10, 0, 10, 0)
         lineStack.centerAlignContent()
 
         let team1Logo = await getImageByUrl(team1.TeamLogo)
@@ -155,121 +152,16 @@ async function renderMatchList() {
         team1.score = val.ScoreA
         team2.score = val.ScoreB
 
-
-        // 时间
-        if (!smallWidget) {
-            let dateTimeStack = lineStack.addStack()
-            dateTimeStack.size = new Size(timeStrWidth, imageSize + teamNameHeight)
-            dateTimeStack.layoutVertically()
-            dateTimeStack.centerAlignContent()
-
-            let dateStrStack = dateTimeStack.addStack()
-            dateStrStack.size = new Size(timeStrWidth, imageSize * 0.4)
-            let dateStrTxt = dateStrStack.addText(dateFormat("mm-dd", matchScheduledAt))
-            dateStrTxt.font = Font.lightMonospacedSystemFont(10)
-            // dateStrTxt.textColor = new Color(fontColor, 1)
-            dateStrTxt.textColor = textColor
-            dateStrStack.addSpacer(20)
-
-
-            let timeStrStack = dateTimeStack.addStack()
-            timeStrStack.size = new Size(timeStrWidth, imageSize * 0.8)
-            timeStrStack.centerAlignContent()
-            let timeStrTxt = timeStrStack.addText(timeStr)
-            timeStrTxt.font = Font.lightMonospacedSystemFont(imageSize * 0.8)
-            // timeStrTxt.textColor = new Color(fontColor, 1)
-            timeStrTxt.textColor = textColor
-            timeStrStack.addSpacer(20)
-
-
-            let proGameTypeStack = dateTimeStack.addStack()
-            proGameTypeStack.size = new Size(timeStrWidth, imageSize * 0.4)
-            let gameTypeStr = val.GameTypeName.length + val.GameProcName.length >= 7 ? val.GameTypeName : val.GameTypeName + '-' + val.GameProcName
-            let proGameTypeStrTxt = proGameTypeStack.addText(gameTypeStr)
-            proGameTypeStrTxt.font = Font.lightSystemFont(10)
-            // proGameTypeStrTxt.textColor = new Color(fontColor, 1)
-            proGameTypeStrTxt.textColor = textColor
-            proGameTypeStack.addSpacer(20)
-        }
-
-
         // 队伍1
         addTeam(lineStack, team1.TeamName, team1Logo)
 
-
-        // 比分
-        let scoreStack = lineStack.addStack()
-        scoreStack.layoutVertically()
-        scoreStack.centerAlignContent()
-        scoreStack.size = new Size(imageSize * 2.5, imageSize + teamNameHeight + 10)
-        scoreStack.setPadding(20, 0, 0, 0)
-
-
-        let scoreTopStack = scoreStack.addStack()
-        scoreTopStack.size = new Size(imageSize * 2.5, imageSize)
-        let scoreBottomStack = scoreStack.addStack()
-        scoreBottomStack.size = new Size(imageSize * 2.5, teamNameHeight)
-        let status = val.MatchStatus
-        if (status === "1") {
-            const vsTxt = scoreTopStack.addText("VS")
-            vsTxt.centerAlignText()
-            vsTxt.font = Font.lightMonospacedSystemFont(imageSize * 0.8)
-            // vsTxt.textColor = new Color(fontColor, 1)
-            vsTxt.textColor = textColor
-            let statusTxt = scoreBottomStack.addText("未开始")
-            statusTxt.centerAlignText()
-            statusTxt.font = Font.mediumSystemFont(fontSize)
-            // statusTxt.textColor = new Color(fontColor, 1)
-            statusTxt.textColor = textColor
-            scoreStack.setPadding(10, 0, 0, 0)
-        } else {
-            const team1ScoreStack = scoreTopStack.addStack()
-            const scoreDividerStack = scoreTopStack.addStack()
-            const team2ScoreStack = scoreTopStack.addStack()
-            team1ScoreStack.size = new Size(imageSize * 0.8, imageSize)
-            team1ScoreStack.backgroundColor = new Color("#3b3b3b")
-            team1ScoreStack.cornerRadius = 5
-
-            scoreDividerStack.size = new Size(imageSize * 0.4, imageSize)
-            scoreDividerStack.setPadding(0, 0, 2, 0)
-
-            team2ScoreStack.size = new Size(imageSize * 0.8, imageSize)
-            team2ScoreStack.backgroundColor = new Color("#3b3b3b")
-            team2ScoreStack.cornerRadius = 5
-
-            const team1ScoreTxt = team1ScoreStack.addText(team1.score.toString())
-            team1ScoreTxt.centerAlignText()
-            team1ScoreTxt.font = Font.semiboldSystemFont(imageSize * 0.8)
-            team1ScoreTxt.textColor = Color.white()
-
-            const scoreDividerTxt = scoreDividerStack.addText(":")
-            team1ScoreTxt.centerAlignText()
-            scoreDividerTxt.font = Font.semiboldSystemFont(imageSize * 0.8)
-            // scoreDividerTxt.textColor = new Color(fontColor, 1)
-            scoreDividerTxt.textColor = textColor
-
-
-            const team2ScoreTxt = team2ScoreStack.addText(team2.score.toString())
-            team2ScoreTxt.centerAlignText()
-            team2ScoreTxt.font = Font.semiboldSystemFont(imageSize * 0.8)
-            team2ScoreTxt.textColor = Color.white()
-
-            if (status === "3") {
-                if (team1.score > team2.score) {
-                    team1ScoreTxt.textColor = new Color("#0febc1")
-                } else if (team1.score < team2.score) {
-                    team2ScoreTxt.textColor = new Color("#0febc1")
-                }
-            }
-            // let statusTxt = status === "2" ? scoreBottomStack.addText("进行中") : scoreBottomStack.addText("已结束")
-            // statusTxt.centerAlignText()
-            // statusTxt.font = Font.mediumSystemFont(imageSize * 0.4)
-            // statusTxt.textColor = new Color(fontColor, 1)
-        }
+        // 比赛状态
+        addStatus(lineStack, team1, team2, val)
 
         // 队伍2
         addTeam(lineStack, team2.TeamName, team2Logo)
     }
+    addDividerLine(widget, lineWidth, 6, textColor)
 }
 
 function addTeam(rootStack, teamName, logo) {
@@ -286,7 +178,105 @@ function addTeam(rootStack, teamName, logo) {
     let teamtext = teamTxtStack.addText(teamName)
     teamtext.textColor = textColor
     teamtext.font = Font.semiboldSystemFont(fontSize)
+}
 
+function addStatus(rootStack, team1, team2, val) {
+    // 比分
+    let scoreStack = rootStack.addStack()
+    scoreStack.layoutVertically()
+    scoreStack.centerAlignContent()
+    scoreStack.size = new Size(timeStrWidth, imageSize + teamNameHeight)
+    scoreStack.setPadding(20, 0, 10, 0)
+    let status = val.MatchStatus
+    if (status === "1") {
+        // const vsTxt = scoreTopStack.addText("VS")
+        // vsTxt.centerAlignText()
+        // vsTxt.font = Font.lightMonospacedSystemFont(imageSize * 0.8)
+        // // vsTxt.textColor = new Color(fontColor, 1)
+        // vsTxt.textColor = textColor
+        // let statusTxt = scoreBottomStack.addText("未开始")
+        // statusTxt.centerAlignText()
+        // statusTxt.font = Font.mediumSystemFont(fontSize)
+        // // statusTxt.textColor = new Color(fontColor, 1)
+        // statusTxt.textColor = textColor
+
+        // 时间
+        let matchTime = new Date(val.MatchDate.replace(/-/g, "/"))
+
+        let timeStr = dateFormat("HH:MM", matchTime)
+        let dateStr = dateFormat("mm-dd", matchTime)
+        let today = new Date()
+        if (matchTime.getMonth() === today.getMonth()) {
+            if (matchTime.getDay() === today.getDay() + 1) {
+                dateStr = "明天"
+            } else if (matchTime.getDay() === today.getDay() + 2) {
+                dateStr = "后天"
+            }
+        }
+
+        let timeStrStack = scoreStack.addStack()
+        timeStrStack.centerAlignContent()
+        timeStrStack.size = new Size(timeStrWidth, imageSize)
+        let timeStrTxt = timeStrStack.addText(dateStr + " " + timeStr)
+        timeStrTxt.font = Font.semiboldSystemFont(fontSize)
+        timeStrTxt.textColor = textColor
+
+        let proGameTypeStack = scoreStack.addStack()
+        proGameTypeStack.centerAlignContent()
+        proGameTypeStack.size = new Size(timeStrWidth, imageSize * 0.6)
+        let gameTypeStr = val.GameTypeName + '-' + val.GameProcName + '-' + val.GameModeName
+        let proGameTypeStrTxt = proGameTypeStack.addText(gameTypeStr)
+        proGameTypeStrTxt.font = Font.regularSystemFont(fontSize)
+        proGameTypeStrTxt.textColor = new Color("#444444")
+
+    } else {
+        let scoreTopStack = scoreStack.addStack()
+        scoreTopStack.size = new Size(timeStrWidth, imageSize)
+        let scoreBottomStack = scoreStack.addStack()
+        scoreBottomStack.size = new Size(timeStrWidth, teamNameHeight)
+        const team1ScoreStack = scoreTopStack.addStack()
+        const scoreDividerStack = scoreTopStack.addStack()
+        const team2ScoreStack = scoreTopStack.addStack()
+        team1ScoreStack.size = new Size(imageSize * 0.8, imageSize)
+        team1ScoreStack.backgroundColor = new Color("#3b3b3b")
+        team1ScoreStack.cornerRadius = 5
+
+        scoreDividerStack.size = new Size(imageSize * 0.4, imageSize)
+        scoreDividerStack.setPadding(0, 0, 2, 0)
+
+        team2ScoreStack.size = new Size(imageSize * 0.8, imageSize)
+        team2ScoreStack.backgroundColor = new Color("#3b3b3b")
+        team2ScoreStack.cornerRadius = 5
+
+        const team1ScoreTxt = team1ScoreStack.addText(team1.score.toString())
+        team1ScoreTxt.centerAlignText()
+        team1ScoreTxt.font = Font.semiboldSystemFont(imageSize * 0.8)
+        team1ScoreTxt.textColor = Color.white()
+
+        const scoreDividerTxt = scoreDividerStack.addText(":")
+        team1ScoreTxt.centerAlignText()
+        scoreDividerTxt.font = Font.semiboldSystemFont(imageSize * 0.8)
+        // scoreDividerTxt.textColor = new Color(fontColor, 1)
+        scoreDividerTxt.textColor = textColor
+
+
+        const team2ScoreTxt = team2ScoreStack.addText(team2.score.toString())
+        team2ScoreTxt.centerAlignText()
+        team2ScoreTxt.font = Font.semiboldSystemFont(imageSize * 0.8)
+        team2ScoreTxt.textColor = Color.white()
+
+        if (status === "3") {
+            if (team1.score > team2.score) {
+                team1ScoreTxt.textColor = new Color("#0febc1")
+            } else if (team1.score < team2.score) {
+                team2ScoreTxt.textColor = new Color("#0febc1")
+            }
+        }
+        let statusTxt = status === "2" ? scoreBottomStack.addText("进行中") : scoreBottomStack.addText("已结束")
+        statusTxt.centerAlignText()
+        statusTxt.font = Font.mediumSystemFont(teamNameHeight)
+        statusTxt.textColor = new Color(fontColor, 1)
+    }
 }
 
 /***********************************************************
@@ -523,9 +513,6 @@ function addDividerLine(dividerStack, dividerLineWidth, dividerLineHeight, divid
     sideDividerStack.size = new Size(dividerLineWidth, dividerLineHeight)
     sideDividerStack.layoutVertically()
     sideDividerStack.centerAlignContent()
-    sideDividerStack.backgroundColor = new Color("#3b3b3b")
-    // let sideTopSpacerStack = sideDividerStack.addStack()
-    // sideTopSpacerStack.size = new Size(dividerLineWidth, Math.floor(dividerLineHeight / 2) - 1)
     const sideDivider = sideDividerStack.addStack()
     sideDivider.size = new Size(dividerLineWidth, 1)
     sideDivider.backgroundColor = dividerLineColor
