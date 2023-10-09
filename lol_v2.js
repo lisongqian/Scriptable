@@ -141,7 +141,7 @@ async function renderMatchList() {
         let gameType = val.GameName
         let timeStr = dateFormat("HH:MM", matchScheduledAt)
         if (j === 0 || lastGameType !== gameType) {
-            addDivider(gameType, lineWidth, 12, dlineWidth, dLineStrWidth)
+            addDivider(gameType, lineWidth, 12)
             lastGameType = gameType
         } else {
             addDividerLine(widget, lineWidth, 6, new Color("#909399"))
@@ -547,12 +547,12 @@ function addDividerLine(dividerStack, dividerLineWidth, dividerLineHeight, divid
  * @param {string} text : 分隔符显示的文字
  * @param {number} dividerWidth : 分割线总宽度
  * @param {number} dividerHeight : 分割线高度
- * @param {number} dividerLineWidth : 分割线左右侧线条的宽度
- * @param {number} dividerTxtWidth : 分割线中文本的宽度
  */
-function addDivider(text, dividerWidth, dividerHeight, dividerLineWidth, dividerTxtWidth) {
-    // const day = getDay(date)
-    // const day = dateFormat("mm-dd", date)
+function addDivider(text, dividerWidth, dividerHeight) {
+    let txtFontSize = dividerHeight - 1
+    let dividerTxtWidth = text.length * txtFontSize  // 文本长度
+    let dividerLineWidth = (dividerWidth - dividerTxtWidth) / 2
+
     const dividerStack = widget.addStack()
     dividerStack.size = new Size(dividerWidth, dividerHeight)
     // 渲染左侧分割线
@@ -564,7 +564,7 @@ function addDivider(text, dividerWidth, dividerHeight, dividerLineWidth, divider
     // 渲染日期文本
     dividerTxtStack.size = new Size(dividerTxtWidth, dividerHeight)
     const dividerTxt = dividerTxtStack.addText(text)
-    dividerTxt.font = Font.lightMonospacedSystemFont(dividerHeight - 1)
+    dividerTxt.font = Font.lightMonospacedSystemFont(txtFontSize)
     dividerTxt.textColor = textColor
 }
 
