@@ -4,12 +4,12 @@
 /**
  * @author  SongqianLi
  * @email   mail@lisongqian.cn
- * @datetime    2023-5-8 15:19:46
+ * @datetime    2023-10-9 13:23:16
  * @Description LOL比赛日程小组件
  */
 
 // 全局变量声明
-const version = "1.2.4"
+const version = "1.2.5"
 const upgrade = true
 const widget = new ListWidget()
 
@@ -47,7 +47,7 @@ const teamTxtWidth = imageSize // 队名的容器宽度
 const timeStrWidth = imageSize * 3 // 比赛开始时间的容器宽度，比如："16:00"
 const teamNameHeight = imageSize * 0.6 // 队名文本大小
 let lineWidth = teamTxtWidth * 2 + imageSize * 4.5 + timeStrWidth
-let dLineStrWidth = imageSize * 3.5 // 分割线中的日期的宽度
+let dLineStrWidth = imageSize * 3.5 // 分割线中文本的宽度
 if (smallWidget) {
     lineWidth = teamTxtWidth * 2 + imageSize * 4.5
     dLineStrWidth = imageSize * 4.5
@@ -110,23 +110,24 @@ async function renderMatchList() {
             break
         }
     }
-    // if (i > 1) {
-    //     matches = competitionData.slice(i - 2, i - 2 + num)
-    // } else if (i === 1) {//有一个比赛已结束
-    //     matches = competitionData.slice(0, num)
-    // } else if (i === 0) {// 全部比赛结束
-    //     matches = competitionData.slice(-num)
-    // }
-    if (i === competitionData.length) {
-        i -= num
-    } else if (i > 1) {
-        i -= Math.floor(num / 2)
-    } else {//有一个比赛已结束 或 都未开始
+
+    if (competitionData.length < num) {
+        num = competitionData.length
         i = 0
     }
-    if (i + num - 1 >= competitionData.length) {
-        i = competitionData.length - num
+    else {
+        if (i === competitionData.length) {
+            i -= num
+        } else if (i > 1) {
+            i -= Math.floor(num / 2)
+        } else {//有一个比赛进行中 或 都未开始
+            i = 0
+        }
+        if (i + num - 1 >= competitionData.length) {
+            i = competitionData.length - num
+        }
     }
+
     let lastGameType = competitionData[i].GameName
     for (let j = 0; j < num; j++) {
         // 比赛和队伍数据
@@ -542,15 +543,16 @@ function addDividerLine(dividerStack, dividerLineWidth, dividerLineHeight, divid
 /**
  * 渲染日期分割线
  * @param {string} text : 分隔符显示的文字
- * @param {number} dividerWidth : 分割线宽度
+ * @param {number} dividerWidth : 分割线总宽度
  * @param {number} dividerHeight : 分割线高度
  * @param {number} dividerLineWidth : 分割线左右侧线条的宽度
- * @param {number} dividerTxtWidth : 分割线中的日期文本的宽度
+ * @param {number} dividerTxtWidth : 分割线中文本的宽度
  */
 function addDivider(text, dividerWidth, dividerHeight, dividerLineWidth, dividerTxtWidth) {
     // const day = getDay(date)
     // const day = dateFormat("mm-dd", date)
     const dividerStack = widget.addStack()
+    dividerStack.size = new Size(dividerWidth, dividerHeight)
     // 渲染左侧分割线
     addDividerLine(dividerStack, dividerLineWidth, dividerHeight, textColor)
     // 日期文本容器
@@ -558,7 +560,6 @@ function addDivider(text, dividerWidth, dividerHeight, dividerLineWidth, divider
     // 渲染右侧分割线
     addDividerLine(dividerStack, dividerLineWidth, dividerHeight, textColor)
     // 渲染日期文本
-    dividerStack.size = new Size(dividerWidth, dividerHeight)
     dividerTxtStack.size = new Size(dividerTxtWidth, dividerHeight)
     const dividerTxt = dividerTxtStack.addText(text)
     dividerTxt.font = Font.lightMonospacedSystemFont(dividerHeight - 1)
