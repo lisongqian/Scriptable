@@ -27,12 +27,11 @@ let textColor = Color.dynamic(
 let imageSize = 35
 let fontSize = 12
 let smallWidget = false
-let teamTxtWidth = imageSize // 队名的容器宽度
-let timeStrWidth = imageSize * 3// 比赛开始时间的容器宽度，比如："16:00"
+let timeStrWidth = imageSize * 3 // 比赛开始时间的容器宽度，比如："16:00"
+
+let teamWidth = imageSize * 2 // 队伍容器宽度
 let teamNameHeight = imageSize * 0.6 // 队名文本大小
-let lineWidth = teamTxtWidth * 2 + imageSize * 4.5 + timeStrWidth  // 分割线长度
-let dLineStrWidth = imageSize * 3.5 // 分割线中文本的宽度
-let dlineWidth = (lineWidth - dLineStrWidth) / 2 // 分割线的左右两侧宽度比如 : ------2020-10-05------
+let lineWidth = teamWidth * 2 + imageSize * 3 + timeStrWidth  // 分割线长度
 
 /**
  * 参数更新函数
@@ -42,6 +41,7 @@ function updateGlobalData() {
         Color.white(),
         Color.white()
     )
+    widget.setPadding(5, 5, 5, 5)
     if (config.runsInWidget) {
         presentSize = null
     }
@@ -51,8 +51,7 @@ function updateGlobalData() {
         smallWidget = true
     }
     if (smallWidget) {
-        lineWidth = teamTxtWidth * 2 + imageSize * 4.5
-        dLineStrWidth = imageSize * 4.5
+        lineWidth = teamWidth * 2 + imageSize * 4.5
     }
 }
 
@@ -147,13 +146,12 @@ async function renderMatchList() {
             addDividerLine(widget, lineWidth, 6, new Color("#909399"))
         }
         let lineStack = widget.addStack()
-        lineStack.size = new Size(lineWidth, imageSize + teamNameHeight + 5)
+        lineStack.size = new Size(lineWidth, imageSize + teamNameHeight)
+        lineStack.setPadding(10, 0, 10, 0)
         lineStack.centerAlignContent()
 
         let team1Logo = await getImageByUrl(team1.TeamLogo)
         let team2Logo = await getImageByUrl(team2.TeamLogo)
-        team1Logo.size = new Size(imageSize, imageSize)
-        team2Logo.size = new Size(imageSize, imageSize)
         team1.score = val.ScoreA
         team2.score = val.ScoreB
 
@@ -196,21 +194,8 @@ async function renderMatchList() {
 
 
         // 队伍1
-        let team1Stack = lineStack.addStack()
-        team1Stack.size = new Size(imageSize * 2, imageSize + teamNameHeight + 10)
-        team1Stack.layoutVertically()
-        team1Stack.addImage(team1Logo)
-        team1Stack.centerAlignContent()
-        team1Stack.setPadding(10, 0, 0, 0)
-        let team1ImgStack = team1Stack.addStack()
-        team1ImgStack.size = new Size(imageSize * 2, imageSize)
-        team1ImgStack.addImage(team1Logo)
-        let team1TxtStack = team1Stack.addStack();//文字居中用
-        team1TxtStack.size = new Size(imageSize * 2, teamNameHeight)
-        let team1text = team1TxtStack.addText(team1.TeamName)
-        // team1text.textColor = new Color(fontColor, 1)
-        team1text.textColor = textColor
-        team1text.font = Font.semiboldSystemFont(fontSize)
+        addTeam(lineStack, team1.TeamName, team1Logo)
+
 
         // 比分
         let scoreStack = lineStack.addStack()
@@ -233,7 +218,7 @@ async function renderMatchList() {
             vsTxt.textColor = textColor
             let statusTxt = scoreBottomStack.addText("未开始")
             statusTxt.centerAlignText()
-            statusTxt.font = Font.mediumSystemFont(imageSize * 0.4)
+            statusTxt.font = Font.mediumSystemFont(fontSize)
             // statusTxt.textColor = new Color(fontColor, 1)
             statusTxt.textColor = textColor
             scoreStack.setPadding(10, 0, 0, 0)
@@ -283,21 +268,24 @@ async function renderMatchList() {
         }
 
         // 队伍2
-        let team2Stack = lineStack.addStack()
-        team2Stack.size = new Size(imageSize * 2, imageSize + teamNameHeight + 10)
-        team2Stack.layoutVertically()
-        team2Stack.centerAlignContent()
-        team2Stack.setPadding(10, 0, 0, 0)
-        team2Stack.addImage(team2Logo)
-        let team2ImgStack = team2Stack.addStack()
-        team2ImgStack.size = new Size(imageSize * 2, imageSize)
-        team2ImgStack.addImage(team2Logo)
-        let team2TxtStack = team2Stack.addStack();//文字居中用
-        team2TxtStack.size = new Size(imageSize * 2, teamNameHeight)
-        let team2text = team2TxtStack.addText(team2.TeamName)
-        team2text.textColor = textColor
-        team2text.font = Font.semiboldSystemFont(fontSize)
+        addTeam(lineStack, team2.TeamName, team2Logo)
     }
+}
+
+function addTeam(rootStack, teamName, logo) {
+    let teamStack = rootStack.addStack()
+    teamStack.size = new Size(teamWidth, imageSize + fontSize)
+    teamStack.layoutVertically()
+    teamStack.centerAlignContent() // 垂直居中
+    let teamImgStack = teamStack.addStack()
+    teamImgStack.size = new Size(teamWidth, imageSize)
+    teamImgStack.addImage(logo)
+    let teamTxtStack = teamStack.addStack();//文字水平居中
+    teamTxtStack.centerAlignContent()
+    teamTxtStack.size = new Size(teamWidth, fontSize)
+    let teamtext = teamTxtStack.addText(teamName)
+    teamtext.textColor = textColor
+    teamtext.font = Font.semiboldSystemFont(fontSize)
 
 }
 
@@ -535,6 +523,7 @@ function addDividerLine(dividerStack, dividerLineWidth, dividerLineHeight, divid
     sideDividerStack.size = new Size(dividerLineWidth, dividerLineHeight)
     sideDividerStack.layoutVertically()
     sideDividerStack.centerAlignContent()
+    sideDividerStack.backgroundColor = new Color("#3b3b3b")
     // let sideTopSpacerStack = sideDividerStack.addStack()
     // sideTopSpacerStack.size = new Size(dividerLineWidth, Math.floor(dividerLineHeight / 2) - 1)
     const sideDivider = sideDividerStack.addStack()
